@@ -1,5 +1,5 @@
 grammar ulNoActions;
-        
+
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -28,30 +28,51 @@ program : function +;
 
 function: functionDecl functionBody ;
 
-functionDecl: TYPE ID '(' ')' ;
+functionDecl: compoundType ID '(' formalParameters* ')' ;
 
-functionBody: '{' varDecl* statement*'}' ;
+formalParameters : compoundType ID moreFormals* ;
+
+moreFormals : ',' compoundType ID ;
+
+functionBody: '{' varDecl* statement* '}' ;
 
 varDecl: compoundType ID ';' ;
 
-compoundType: TYPE ('[' INTEGER ']') ? ;
+compoundType  : type ( '[' INTEGER_LITERAL ']' )? ;
 
-statement : expr ';' ;
-
-expr
-  : baseExpr OP expr
-  | ID
-  | LITERAL
+statement
+  : expr ';'
+  | 'if' '(' expr ')' block ( 'else' block )?
+  | 'while' '(' expr ')' block
+  | 'print' expr ';'
+  | 'println' expr ';'
+  | 'return' expr ';'
+  | ID ( '[' expr ']' )? '=' expr ';'
   ;
 
-baseExpr 
-  : 
-  | ID
-  | LITERAL
-  | ID '[' expr ']'
+block : '{' statement* '}' ;
+
+expr : cmpExpr ;
+
+cmpExpr : lessExpr ( '==' lessExpr )* ;
+
+lessExpr : plusMinusExpr ( '<' plusMinusExpr )* ;
+
+plusMinusExpr : multiExpr ( ( '+' | '-' ) multiExpr )* ;
+
+multiExpr : atom ( '*' atom )* ;
+
+atom
+  :
+  | constant
+  | identifier
+  | '(' expr ')'
   ;
 
-/* Lexer */
+identifier : ID ;
+
+type : TYPE ;
+
 TYPE
   : 'int'
   | 'float'
@@ -61,42 +82,24 @@ TYPE
   | 'void'
   ;
 
-LITERAL 
-  : INTEGER
-  | STRING
-  | FLOAT
-  | CHAR
+constant
+  : INTEGER_LITERAL
+  | STRING_LITERAL
+  | FLOAT_LITERAL
+  | CHAR_LITERAL
   | 'true'
   | 'false'
   ;
 
-OP 
-  : CMP
-  | LESS
-  | PLUS
-  | MINUS 
-  | TIMES
-  ;
-
 ID  : LETTER ( LETTER | DIGIT )* ;
 
-INTEGER : DIGIT * ;
+INTEGER_LITERAL : DIGIT+ ;
 
-STRING : '"' ( LETTER | DIGIT )* '"' ;
+STRING_LITERAL : '"' ( LETTER | DIGIT )* '"' ;
 
-FLOAT : DIGIT+ '.' DIGIT+ ;
+FLOAT_LITERAL : DIGIT+ '.' DIGIT+ ;
 
-CHAR : '\'' ( LETTER | DIGIT )? '\'' ;
-
-CMP : '==' ;
-
-LESS : '<' ;
-
-PLUS : '+' ;
-
-MINUS : '-' ;
-
-TIMES : '*' ;
+CHAR_LITERAL : '\'' ( LETTER | DIGIT )? '\'' ;
 
 fragment LETTER : ('A'..'Z' | 'a'..'z' | '_') ;
 
