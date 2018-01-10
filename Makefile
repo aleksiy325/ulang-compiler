@@ -13,8 +13,8 @@ grammar: $(GSRCS)
 
 compiler:
 	mkdir -p $(BIN)
-	@javac -classpath $(CLASSPATH):$(BIN) -d $(BIN) $(BIN)/*.java
-	@javac -classpath $(CLASSPATH):$(BIN) -d $(BIN) $(SRC)/*.java
+	javac -d $(BIN) $(BIN)/*.java
+	javac -d $(BIN) $(SRC)/*.java
 
 clean:
 	rm -rf bin
