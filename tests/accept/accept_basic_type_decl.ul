@@ -1,0 +1,9 @@
+void main(){
+	int test;
+	float _test;
+	char _test123;
+	string _123;
+	boolean _123test;
+	void t123t_;
+}
+

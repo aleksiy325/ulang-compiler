@@ -4,6 +4,7 @@ GSRC= $(GNAME).g
 BIN = bin
 SRC = src
 TESTS = tests
+comp = Compiler
 
 
 all: grammar compiler
@@ -20,5 +21,9 @@ clean:
 	rm -rf bin
 
 test:
-	find tests -name *.ul | xargs java -classpath $(CLASSPATH):$(BIN) Compiler
+	@echo "ACCEPT"
+	for f in tests/accept/*.ul; do echo $$f; java $(comp) $$f; done
+	@echo "REJECT"
+	for f in tests/reject/*.ul; do echo $$f; java $(comp) $$f; done	
+
  
