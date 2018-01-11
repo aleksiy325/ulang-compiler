@@ -41,7 +41,8 @@ varDecl: compoundType ID ';' ;
 compoundType  : type ( '[' INTEGER_LITERAL ']' )? ;
 
 statement
-  : expr ';'
+  : ';'
+  | expr ';'
   | 'if' '(' expr ')' block ( 'else' block )?
   | 'while' '(' expr ')' block
   | 'print' expr ';'
@@ -63,8 +64,7 @@ plusMinusExpr : multiExpr ( ( '+' | '-' ) multiExpr )* ;
 multiExpr : atom ( '*' atom )* ;
 
 atom
-  :
-  | constant
+  :constant
   | identifier
   | '(' expr ')'
   ;

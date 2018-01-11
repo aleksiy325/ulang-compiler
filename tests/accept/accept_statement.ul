@@ -1,0 +1,14 @@
+void main(){
+	if (name == 1 + 23 * 2 ){
+		;
+		test;
+		a + b + c;
+	}
+
+	if (abc) {
+		test + 123 + 2;
+		a == b;
+	}else{
+		something;
+	}
+}
