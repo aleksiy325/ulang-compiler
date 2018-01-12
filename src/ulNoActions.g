@@ -102,11 +102,13 @@ ID  : LETTER ( LETTER | DIGIT )* ;
 
 INTEGER_LITERAL : DIGIT+ ;
 
-STRING_LITERAL : '"' ( LETTER | DIGIT )* '"' ;
+STRING_LITERAL : '"' STRING_GUTS '"' ;
 
 FLOAT_LITERAL : DIGIT+ '.' DIGIT+ ;
 
 CHAR_LITERAL : '\'' ( LETTER | DIGIT )? '\'' ;
+
+fragment STRING_GUTS : ( ~('\\'|'"') )* ;
 
 fragment LETTER : ('A'..'Z' | 'a'..'z' | '_') ;
 
