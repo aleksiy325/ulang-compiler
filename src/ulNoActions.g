@@ -1,10 +1,5 @@
 grammar ulNoActions;
 
-options 
-{
-    backtrack = true;
-}
-
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -73,7 +68,7 @@ atom
   : constant
   | '(' expr ')'
   | identifier '[' expr ']'
-  | identifier '(' expr ')' 
+  | identifier '(' expr ')'
   | identifier
   ;
 

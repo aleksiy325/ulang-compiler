@@ -1,5 +1,10 @@
 grammar ulNoActions;
 
+options
+{
+    backtrack = true;
+}
+
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -28,15 +33,15 @@ program : function +;
 
 function: functionDecl functionBody ;
 
-functionDecl: compoundType identifier '(' formalParameters* ')' ;
+functionDecl: compoundType ID '(' formalParameters* ')' ;
 
-formalParameters : compoundType identifier moreFormals* ;
+formalParameters : compoundType ID moreFormals* ;
 
-moreFormals : ',' compoundType identifier ;
+moreFormals : ',' compoundType ID ;
 
 functionBody: '{' varDecl* statement* '}' ;
 
-varDecl: compoundType identifier ';' ;
+varDecl: compoundType ID ';' ;
 
 compoundType  : type ( '[' INTEGER_LITERAL ']' )? ;
 
@@ -48,16 +53,13 @@ statement
   | 'print' expr ';'
   | 'println' expr ';'
   | 'return' expr ';'
-  | identifier ( '[' expr ']' )? '=' expr ';'
+  | identifier '=' expr ';'
+  | identifier '[' expr ']' '=' expr ';'
   ;
 
 block : '{' statement* '}' ;
 
-exprList : expr exprMore* ;
-
-exprMore : ',' expr;
-
-expr : cmpExpr ;
+expr : cmpExpr (',' cmpExpr)* ;
 
 cmpExpr : lessExpr ( '==' lessExpr )* ;
 
@@ -68,12 +70,11 @@ plusMinusExpr : multiExpr ( ( '+' | '-' ) multiExpr )* ;
 multiExpr : atom ( '*' atom )* ;
 
 atom
-  :
-  | constant
+  : constant
   | '(' expr ')'
+  | identifier '[' expr ']'
+  | identifier '(' expr ')'
   | identifier
-  | identifier '(' exprList ')'
-
   ;
 
 identifier : ID ;
