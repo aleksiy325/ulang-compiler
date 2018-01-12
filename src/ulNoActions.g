@@ -49,12 +49,16 @@ statement
   | 'println' expr ';'
   | 'return' expr ';'
   | identifier '=' expr ';'
-  | identifier '[' expr ']' '=' expr ';'
+  | (identifier '[' expr ']' '=' expr ';') => identifier '[' expr ']' '=' expr ';'
   ;
 
 block : '{' statement* '}' ;
 
-expr : cmpExpr (',' cmpExpr)* ;
+exprList : expr exprMore* ;
+
+exprMore : ',' expr ;
+
+expr : cmpExpr;
 
 cmpExpr : lessExpr ( '==' lessExpr )* ;
 
@@ -67,8 +71,8 @@ multiExpr : atom ( '*' atom )* ;
 atom
   : constant
   | '(' expr ')'
+  | identifier '(' exprList ')'
   | identifier '[' expr ']'
-  | identifier '(' expr ')'
   | identifier
   ;
 
