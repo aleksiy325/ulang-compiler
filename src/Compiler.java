@@ -15,9 +15,9 @@ public class Compiler {
 
 		// The name of the grammar here is "ulNoActions",
 		// so ANTLR generates ulNoActionsLexer and ulNoActionsParser
-		ulNoActionsLexer lexer = new ulNoActionsLexer(input);
+		ulangLexer lexer = new ulangLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		ulNoActionsParser parser = new ulNoActionsParser(tokens);
+		ulangParser parser = new ulangParser(tokens);
 
 		try {
 			parser.program();
@@ -27,10 +27,12 @@ public class Compiler {
 			// ANTLR will have already printed information on the
 			// console due to code added to the grammar.  So there is
 			// nothing to do here.
+			System.exit(1);
 		}
 		catch (Exception e) {
 			System.out.println(e);
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 }

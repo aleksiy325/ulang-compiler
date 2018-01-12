@@ -1,4 +1,4 @@
-grammar ulNoActions;
+grammar ulang;
 
 @members
 {
@@ -41,6 +41,7 @@ varDecl: compoundType ID ';' ;
 compoundType  : type ( '[' INTEGER_LITERAL ']' )? ;
 
 statement
+options { backtrack = true; }
   : ';'
   | expr ';'
   | 'if' '(' expr ')' block ( 'else' block )?
@@ -49,7 +50,7 @@ statement
   | 'println' expr ';'
   | 'return' expr ';'
   | identifier '=' expr ';'
-  | (identifier '[' expr ']' '=' expr ';') => identifier '[' expr ']' '=' expr ';'
+  | identifier '[' expr ']' '=' expr ';'
   ;
 
 block : '{' statement* '}' ;
