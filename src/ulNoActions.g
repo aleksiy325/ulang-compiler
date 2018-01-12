@@ -1,5 +1,10 @@
 grammar ulNoActions;
 
+options 
+{
+    backtrack = true;
+}
+
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -48,12 +53,13 @@ statement
   | 'print' expr ';'
   | 'println' expr ';'
   | 'return' expr ';'
-  | ID ( '[' expr ']' )? '=' expr ';'
+  | identifier '=' expr ';'
+  | identifier '[' expr ']' '=' expr ';'
   ;
 
 block : '{' statement* '}' ;
 
-expr : cmpExpr ;
+expr : cmpExpr (',' cmpExpr)* ;
 
 cmpExpr : lessExpr ( '==' lessExpr )* ;
 
@@ -64,9 +70,11 @@ plusMinusExpr : multiExpr ( ( '+' | '-' ) multiExpr )* ;
 multiExpr : atom ( '*' atom )* ;
 
 atom
-  :constant
-  | identifier
+  : constant
   | '(' expr ')'
+  | identifier '[' expr ']'
+  | identifier '(' expr ')' 
+  | identifier
   ;
 
 identifier : ID ;
