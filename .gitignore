@@ -1,8 +1,7 @@
-
 libs
 bin
-tests/reject
-tests/accept
+tests/reject_line
+tests/accept_line
 # Compiled class file
 *.class
 
