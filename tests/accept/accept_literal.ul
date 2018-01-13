@@ -1,8 +1,0 @@
-void main(){
-  123;
-  23.23;
-  'a';
-  "abcdef";
-  true;
-  false;
-}

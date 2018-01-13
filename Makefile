@@ -22,9 +22,17 @@ compiler:
 
 clean:
 	rm -rf bin
+	rm -rf tests/accept
+	rm -rf tests/reject
 
-test:
-	@echo "accept"
-	@for f in tests/accept/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END}" $$f; else echo -e "${RED}FAILED${END}" $$f; fi done
-	@echo "reject"
-	@for f in tests/reject/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${RED}FAILED${END}" $$f;  else echo -e "${GREEN}PASSED${END}" $$f; fi done
+generate: 
+	mkdir -p tests/accept
+	mkdir -p tests/reject
+	@ let count=0; while read line; do echo -e "void main(){\n	$$line}" > "tests/accept/accept_$$count.ul"; ((count++)) ; done < tests/accept.txt
+	@ let count=0; while read line; do echo -e "void main(){\n	$$line}" > "tests/reject/reject_$$count.ul"; ((count++)) ; done < tests/reject.txt
+
+test: generate
+	@echo "---------------- Accept Tests ----------------"
+	@for f in tests/accept/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi done
+	@echo "---------------- Reject Tests ----------------"
+	@for f in tests/reject/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${RED}FAILED${END} $$?" $$f;  else echo -e "${GREEN}PASSED${END} $$?" $$f; fi done

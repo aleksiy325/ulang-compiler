@@ -1,0 +1,34 @@
+a + 1;
+a * (a + b) < 10 * 20 + 3;
+a + b == 23 + ( a - b ) * 10 < true ;
+int test;
+float _test;
+char _test123;
+string _123;
+boolean _123test;
+void t123t_;
+test = 12;
+_test = 12.32;
+_test123 = 'c';
+_123 = " 123 'n ' abc !@#$%^&*()_=+- ";
+_123test;
+t123t_;
+;
+1;
+1+1;
+1 == 1;
+1 * (1 + 1);
+1 * (1 + 1) == 1 + 1 * 2 < test;
+abc(1, 2, 3);
+abc(a[1], b[2]);
+abc(1, 2, 3) + 1 * 2;
+(abc( abc(1, 2, 3))) + 5;
+abc(a[5]);
+a[5] + 1 + abc(a[5], 1 , 2);
+if (name == 1 + 23 * 2 ){; test; a + b + c; }
+if (abc) { test + 123 + 2; a == b; }else{ something;}
+return test;
+return 1 == 1;
+print 1 + 2 + 3;
+print "test string" ;
+println "test string" ;
