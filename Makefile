@@ -6,6 +6,7 @@ SRC = src
 TESTS = tests
 PROG = Compiler
 ACCEPT = $(TESTS)/accept
+REJECT = $(TESTS)/reject
 ACCEPT_LINE = $(TESTS)/accept_line
 REJECT_LINE = $(TESTS)/reject_line
 GREEN=\e[0;32m
@@ -40,6 +41,7 @@ accept:
 	@for f in ./$(ACCEPT_LINE)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi done
 
 reject:
+	cp $(REJECT)/*.ul $(REJECT_LINE)/
 	@echo "---------------- Reject Tests ----------------"
 	@for f in $(REJECT_LINE)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${RED}FAILED${END} $$?" $$f;  else echo -e "${GREEN}PASSED${END} $$?" $$f; fi done 
 
