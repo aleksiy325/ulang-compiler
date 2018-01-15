@@ -1,5 +1,7 @@
 import org.antlr.runtime.*;
+import java.util.List;
 import java.io.*;
+
 
 public class Compiler {
 	public static void main (String[] args) throws Exception {
@@ -32,7 +34,6 @@ public class Compiler {
 		catch (Exception e) {
 			System.out.println(e);
 			e.printStackTrace();
-			System.exit(1);
 		}
 	}
 }

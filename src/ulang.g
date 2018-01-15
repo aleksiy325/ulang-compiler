@@ -1,5 +1,9 @@
 grammar ulang;
 
+@header {
+  import java.util.LinkedList;
+}
+
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -24,19 +28,22 @@ public void recoverFromMismatchedSet (IntStream input,
         }
 }
 
-program : function +;
+program : function+ EOF ;
 
 function: functionDecl functionBody ;
 
-functionDecl: compoundType ID '(' formalParameters* ')' ;
+functionDecl: compoundType identifier '(' formalParameters ')' ;
 
-formalParameters : compoundType ID moreFormals* ;
+formalParameters 
+  : compoundType identifier moreFormals*
+  |
+  ;
 
 moreFormals : ',' compoundType ID ;
 
 functionBody: '{' varDecl* statement* '}' ;
 
-varDecl: compoundType ID ';' ;
+varDecl: compoundType identifier ';' ;
 
 compoundType  : type ( '[' INTEGER_LITERAL ']' )? ;
 
@@ -48,14 +55,17 @@ options { backtrack = true; }
   | 'while' '(' expr ')' block
   | 'print' expr ';'
   | 'println' expr ';'
-  | 'return' expr ';'
+  | 'return' expr? ';'
   | identifier '=' expr ';'
   | identifier '[' expr ']' '=' expr ';'
   ;
 
 block : '{' statement* '}' ;
 
-exprList : expr exprMore* ;
+exprList 
+  : expr exprMore* 
+  | 
+  ;
 
 exprMore : ',' expr ;
 
@@ -107,7 +117,7 @@ STRING_LITERAL : '"' STRING_GUTS '"' ;
 
 FLOAT_LITERAL : DIGIT+ '.' DIGIT+ ;
 
-CHAR_LITERAL : '\'' ( LETTER | DIGIT )? '\'' ;
+CHAR_LITERAL : '\'' ~('\\'|'\'' | ' ') '\'' ;
 
 fragment STRING_GUTS : ( ~('\\'|'"') )* ;
 
@@ -118,5 +128,5 @@ fragment DIGIT : '0'..'9' ;
 WS      : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;}
         ;
 
-COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;}
+COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n' | EOF) { $channel = HIDDEN;}
         ;

@@ -5,3 +5,40 @@ if( ){;}
 1+;
 1 = 1;
 int 1test;
+'';
+1
+123.;
+.123;
+.;
+'123';
+""";
+"\"";
+1 -;
+1 +;
+1 *;
+1==;
+1 < ;
+1[1];
+int[1] + 1;
+a(1, 2, 3;
+a(1 ,, 2);
+a(1 , 2));
+a(a(1);, a(12), a[2], a);
+if (name == 1 + 23 * 2 ){; test; a + b + c }
+if (abc) { test + 123 + 2; a == b; }else; something;}
+if ( ) {};
+if ( ) {} else {};
+if (true { statement1; 1 + 1; a[1];}
+if () { statement1; 1 + 1; a[1];} else { statement1; 1 + 1; a[1]; }
+while ( ) {};
+print ;
+println ;
+return if () {} ;
+1[2] = 123;
+int 1abc;
+flt abc;
+char abc = 123;
+char 1_test123;
+string string;
+_123 = " ", " ";
+void func (int a, int[123] b, float c, boolean[2] _d){ void func (int a, int[123] b, float c, boolean[2] _d){ return "test"; } }

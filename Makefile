@@ -5,8 +5,9 @@ BIN = bin
 SRC = src
 TESTS = tests
 PROG = Compiler
-ACCEPT = $(TESTS)/accept_line
-REJECT = $(TESTS)/reject_line
+ACCEPT = $(TESTS)/accept
+ACCEPT_LINE = $(TESTS)/accept_line
+REJECT_LINE = $(TESTS)/reject_line
 GREEN=\e[0;32m
 RED=\033[0;31m
 END=\e[0m
@@ -24,17 +25,24 @@ compiler:
 
 clean:
 	rm -rf $(BIN)
-	rm -rf $(ACCEPT)
-	rm -rf $(REJECT)
+	rm -rf $(ACCEPT_LINE)
+	rm -rf $(REJECT_LINE)
 
 generate: 
-	mkdir -p $(ACCEPT)
-	mkdir -p $(REJECT)
-	@ let count=0; while read line; do echo -e "void main(){\n	$$line}" > "$(ACCEPT)/accept_$$count.ul"; ((count++)) ; done < tests/accept.txt
-	@ let count=0; while read line; do echo -e "void main(){\n	$$line}" > "$(REJECT)/reject_$$count.ul"; ((count++)) ; done < tests/reject.txt
+	mkdir -p $(ACCEPT_LINE)
+	mkdir -p $(REJECT_LINE)
+	cp $(ACCEPT)/*.ul $(ACCEPT_LINE)/
+	@ let count=0; while read line; do echo -e "void main(){\n	$$line}" > "$(ACCEPT_LINE)/accept_$$count.ul"; ((count++)) ; done < tests/accept.txt
+	@ let count=0; while read line; do echo -e "void main(){\n	$$line}" > "$(REJECT_LINE)/reject_$$count.ul"; ((count++)) ; done < tests/reject.txt
 
-test: generate
+accept:
 	@echo "---------------- Accept Tests ----------------"
-	@for f in $(ACCEPT)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi done
+	@for f in ./$(ACCEPT_LINE)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi done
+
+reject:
 	@echo "---------------- Reject Tests ----------------"
-	@for f in $(REJECT)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${RED}FAILED${END} $$?" $$f;  else echo -e "${GREEN}PASSED${END} $$?" $$f; fi done
+	@for f in $(REJECT_LINE)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${RED}FAILED${END} $$?" $$f;  else echo -e "${GREEN}PASSED${END} $$?" $$f; fi done 
+
+test: generate accept reject
+	
+
