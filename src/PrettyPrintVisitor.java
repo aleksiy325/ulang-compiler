@@ -17,30 +17,39 @@ public class PrettyPrintVisitor implements Visitor {
 	private static final String ADD = "+";
 	private static final String SUB = "-";
 	private static final String MULTI = "*";
+	private static final String WHILE = "while";
 	private static final String PRINT = "print";
 	private static final String PRINTLN = "println";
 	private static final String RETURN = "return";
 	private static final String EQUALS = "=";
 	private static final String SINGQUOTE = "'";
 
+	int indent;
+
 	public PrettyPrintVisitor(){
+		indent = 0;
 
 	}
 
 	private void printIndent() {
-
+		for(int i = 0; i < indent; i++){
+			System.out.print(INDENT);
+		}
 	}
 
 	private void indent() {
-
+		this.indent++;
 	}
 
 	private void unindent() {
-
+		this.indent--;
 	}
 
 	public void visit (ArrayDereference arrd) {
-		System.out.println("ArrayDerefrence");
+		arrd.id.accept(this);
+		System.out.print(LSQR);
+		arrd.expr.accept(this);
+		System.out.print(RSQR);
 	}
 
 	public void visit (AssignmentStatement astmt) {
@@ -60,12 +69,16 @@ public class PrettyPrintVisitor implements Visitor {
 	// }
 
 	public void visit (Block block) {
-		System.out.print(NL + LBRACE + NL);
+		this.printIndent();
+		System.out.print(LBRACE + NL);
+		this.indent();
 		for(int i = 0; i < block.size(); i++){
-			System.out.print(INDENT);
+			this.printIndent();
 			block.get(i).accept(this);
 			System.out.print(NL);
 		}
+		this.unindent();
+		this.printIndent();
 		System.out.print(RBRACE);
 	}
 
@@ -130,17 +143,19 @@ public class PrettyPrintVisitor implements Visitor {
 
 	public void visit (FunctionBody body) {
 		System.out.print(NL + LBRACE + NL);
+		this.indent();
 		for(int i = 0; i < body.varDeclSize(); i++){
-			System.out.print(INDENT);
+			this.printIndent();
 			body.getVarDecl(i).accept(this);
 			System.out.print(NL);
 		}
 		for(int i = 0; i < body.statementSize(); i++){
-			System.out.print(INDENT);
+			this.printIndent();
 			body.getStatementList(i).accept(this);
 			System.out.print(NL);
 		}
-		System.out.print(RBRACE + NL);
+		this.unindent();
+		System.out.print(RBRACE);
 	}
 
 	public void visit (FunctionCall funccall) {
@@ -170,10 +185,12 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit (IfElseStatement ifelsestmt) {
 		System.out.print(IF + SPACE + LBRACK);
 		ifelsestmt.expr.accept(this);
-		System.out.print(RBRACK);
+		System.out.print(RBRACK + NL);
 		ifelsestmt.ifblock.accept(this);
 		if ( ifelsestmt.hasElse ) {
-			System.out.print(ELSE);
+			System.out.print(NL);
+			this.printIndent();
+			System.out.print(ELSE + NL);
 			ifelsestmt.elseblock.accept(this);
 		}
 	}
@@ -225,6 +242,9 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit (Program prog) {
 		for(int i = 0; i < prog.size(); i++) {
 			prog.get(i).accept(this);
+			if( i < prog.size() - 1 ){
+				System.out.print(NL + NL);
+			}
 		}
 	}
 
@@ -264,9 +284,9 @@ public class PrettyPrintVisitor implements Visitor {
 	}
 
 	public void visit (WhileStatement whilestmt) {
-		System.out.print(IF + SPACE + LBRACK);
+		System.out.print(WHILE + SPACE + LBRACK);
 		whilestmt.expr.accept(this);
-		System.out.print(RBRACK);
+		System.out.print(RBRACK + NL);
 		whilestmt.block.accept(this);
 	}
 

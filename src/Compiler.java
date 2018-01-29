@@ -20,7 +20,7 @@ public class Compiler {
 		ulangLexer lexer = new ulangLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ulangParser parser = new ulangParser(tokens);
-		TestVisitor visitor = new TestVisitor();
+		PrettyPrintVisitor visitor = new PrettyPrintVisitor();
 
 		try {
 			Program p = parser.program();

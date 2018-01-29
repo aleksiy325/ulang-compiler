@@ -1,5 +1,6 @@
 libs
 bin
+tmp
 tests/reject_line
 tests/accept_line
 # Compiled class file

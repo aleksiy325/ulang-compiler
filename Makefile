@@ -1,12 +1,14 @@
 SHELL := /bin/bash
 GNAME= ulang
 GSRC= $(GNAME).g
+TMP = tmp
 BIN = bin
 SRC = src
 TESTS = tests
 PROG = Compiler
 ACCEPT = $(TESTS)/accept
 REJECT = $(TESTS)/reject
+PRETTY = $(TESTS)/pretty
 ACCEPT_LINE = $(TESTS)/accept_line
 REJECT_LINE = $(TESTS)/reject_line
 GREEN=\e[0;32m
@@ -25,12 +27,13 @@ compiler:
 	javac -d $(BIN) $(SRC)/*.java
 
 run:
-	java $(PROG)  $(ACCEPT)/sample.ul
+	java $(PROG)  $(PRETTY)/sample.ul
 
 clean:
 	rm -rf $(BIN)
 	rm -rf $(ACCEPT_LINE)
 	rm -rf $(REJECT_LINE)
+	rm -rf $(TMP)
 
 generate: 
 	mkdir -p $(ACCEPT_LINE)
@@ -47,6 +50,10 @@ reject:
 	cp $(REJECT)/*.ul $(REJECT_LINE)/
 	@echo "---------------- Reject Tests ----------------"
 	@for f in $(REJECT_LINE)/*.ul; do java $(PROG) $$f; if [ $$? -eq 0 ]; then echo -e "${RED}FAILED${END} $$?" $$f;  else echo -e "${GREEN}PASSED${END} $$?" $$f; fi done 
+
+pretty:
+	mkdir -p tmp
+	@let count=0; for f in ./$(PRETTY)/*.ul; do java $(PROG) $$f > ./$(TMP)/$$count.ul; diff -Z ./$(TMP)/$$count.ul $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi; ((count++)); done 
 
 test: generate accept reject
 	
