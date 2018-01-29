@@ -20,9 +20,11 @@ public class Compiler {
 		ulangLexer lexer = new ulangLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ulangParser parser = new ulangParser(tokens);
+		TestVisitor visitor = new TestVisitor();
 
 		try {
-			parser.program();
+			Program p = parser.program();
+			p.accept(visitor);
 		}
 		catch (RecognitionException e )	{
 			// A lexical or parsing error occured.

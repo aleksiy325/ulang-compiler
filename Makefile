@@ -24,6 +24,9 @@ compiler:
 	javac -d $(BIN) $(BIN)/*.java
 	javac -d $(BIN) $(SRC)/*.java
 
+run:
+	java $(PROG)  $(ACCEPT)/test.ul
+
 clean:
 	rm -rf $(BIN)
 	rm -rf $(ACCEPT_LINE)
