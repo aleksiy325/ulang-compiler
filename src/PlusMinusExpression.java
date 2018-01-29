@@ -1,28 +1,16 @@
-import java.util.ArrayList;
-
 public class PlusMinusExpression extends Expression{
-	ArrayList<MultiplicationExpression> mpexprList;
-	ArrayList<Boolean> isAdditionList;
+	Expression left;
+	Expression right;
+	boolean isAddition;
 	
-	public PlusMinusExpression (MultiplicationExpression f) {
-		mpexprList = new ArrayList<MultiplicationExpression>();
-	}
-	
-	public void add (MultiplicationExpression f, String operator) {
-		mpexprList.add(f);
-		isAdditionList.add(operator.equals("+"));
-	}
-	
-	public MultiplicationExpression get (int index) {
-		return mpexprList.get(index);
+	public PlusMinusExpression (Expression left) {
+		this.left = left;
 	}
 
-	public boolean isAddition (int index) {
-		return isAdditionList.get(index - 1);
-	}
-	
-	public int size () {
-		return mpexprList.size();
+	public PlusMinusExpression (Expression left, Expression right, String operator) {
+		this.left = left;
+		this.right = right;
+		this.isAddition = operator.equals("+");
 	}
 
 	public void accept (Visitor v) {

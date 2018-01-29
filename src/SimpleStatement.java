@@ -1,12 +1,12 @@
-public class ReturnStatement extends Statement {
+public class SimpleStatement extends Statement {
 	Expression expr;
 	boolean isEmpty;
 	
-	public ReturnStatement() {
+	public SimpleStatement(){
 		this.isEmpty = true;
 	}
 
-	public ReturnStatement( Expression expr ){
+	public SimpleStatement( Expression expr ){
 		this.expr = expr;
 		this.isEmpty = false;
 	}
@@ -14,4 +14,5 @@ public class ReturnStatement extends Statement {
 	public void accept (Visitor v) {
 		v.visit(this);
 	}
+
 }

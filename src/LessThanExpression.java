@@ -1,25 +1,16 @@
-import java.util.ArrayList;
-
 public class LessThanExpression extends Expression{
-	ArrayList<PlusMinusExpression> exprList;
+	Expression left;
+	Expression right;
 	
-	public LessThanExpression (PlusMinusExpression f) {
-		exprList = new ArrayList<PlusMinusExpression>();
-		exprList.add(f);
-	}
-	
-	public void add (PlusMinusExpression f) {
-		exprList.add(f);
-	}
-	
-	public PlusMinusExpression get (int index) {
-		return exprList.get(index);
-	}
-	
-	public int size () {
-		return exprList.size();
+	public LessThanExpression (Expression left) {
+		this.left = left;
 	}
 
+	public LessThanExpression (Expression left, Expression right) {
+		this.left = left;
+		this.right = right;
+	}
+	
 	public void accept (Visitor v) {
 		v.visit(this);
 	}

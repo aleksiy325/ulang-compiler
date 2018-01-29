@@ -1,4 +1,5 @@
 public class IfElseStatement extends Statement {
+	Expression expr;
 	Block ifblock;
 	Block elseblock;
 	boolean hasElse;
@@ -6,7 +7,6 @@ public class IfElseStatement extends Statement {
 	public IfElseStatement(Expression expr, Block ifblock){
 		this.expr = expr;
 		this.ifblock = ifblock;
-		this.isEmpty = false;
 		this.hasElse = false;
 	}
 
@@ -14,7 +14,6 @@ public class IfElseStatement extends Statement {
 		this.expr = expr;
 		this.ifblock = ifblock;
 		this.elseblock = elseblock;
-		this.isEmpty = false;
 		this.hasElse = true;
 	}
 

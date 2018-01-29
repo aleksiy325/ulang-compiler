@@ -25,7 +25,7 @@ compiler:
 	javac -d $(BIN) $(SRC)/*.java
 
 run:
-	java $(PROG)  $(ACCEPT)/test.ul
+	java $(PROG)  $(ACCEPT)/sample.ul
 
 clean:
 	rm -rf $(BIN)

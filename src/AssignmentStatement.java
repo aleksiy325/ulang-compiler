@@ -7,7 +7,6 @@ public class AssignmentStatement extends Statement {
 	public AssignmentStatement(Identifier id, Expression expr) {
 		this.id = id;
 		this.expr = expr;
-		this.isEmpty = false;
 		this.isArray = false;
 	}
 
@@ -15,7 +14,6 @@ public class AssignmentStatement extends Statement {
 		this.id = id;
 		this.size = size;
 		this.expr = expr;
-		this.isEmpty = false;
 		this.isArray = false;
 	}
 

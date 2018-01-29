@@ -1,8 +1,8 @@
-public class ArrayDerefrence extends Atom{
+public class ArrayDereference extends Atom{
 	Identifier id;
 	Expression expr;
 		
-	public ArrayDerefrence (Identifier id, Expression expr){
+	public ArrayDereference (Identifier id, Expression expr){
 		this.id = id;
 		this.expr = expr;
 	}

@@ -1,24 +1,14 @@
-import java.util.ArrayList;
-
 public class CompareExpression extends Expression{
-	ArrayList<LessThanExpression> exprList;
+	Expression left;
+	Expression right;
 	
-	public CompareExpression (LessThanExpression f) {
-		exprList = new ArrayList<LessThanExpression>();
-		exprList.add(f);
-		
+	public CompareExpression (Expression left) {
+		this.left = left;
 	}
-	
-	public void add (LessThanExpression f) {
-		exprList.add(f);
-	}
-	
-	public LessThanExpression get (int index) {
-		return exprList.get(index);
-	}
-	
-	public int size () {
-		return exprList.size();
+
+	public CompareExpression (Expression left, Expression right) {
+		this.left = left;
+		this.right = right;
 	}
 
 	public void accept (Visitor v) {

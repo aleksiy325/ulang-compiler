@@ -1,15 +1,14 @@
 public interface Visitor
 {
-	void visit (ArrayDerefrence arrd);
-	void visit (Atom atom);
-	void visit (BaseElement base);
+	void visit (ArrayDereference arrd);
+	void visit (AssignmentStatement astmt);
+	// void visit (BaseElement base);
 	void visit (Block block);
 	void visit (BooleanConstant bool);
 	void visit (CharConstant character);
 	void visit (CompareExpression cmpexpr);
 	void visit (CompoundType ctype);
-	void visit (Constant constant);
-	void visit (Expression expr);
+	// void visit (Expression expr);
 	void visit (ExpressionList exprlist);
 	void visit (FloatConstant cfloat);
 	void visit (FormalParameter param);
@@ -28,10 +27,11 @@ public interface Visitor
 	void visit (PrintStatement print);
 	void visit (Program prog);
 	void visit (ReturnStatement retstmt);
-	void visit (Statement stmt);
+	void visit (SimpleStatement stmt);
+
 	void visit (StringConstant cstring);
 	void visit (Type type);
 	void visit (VariableDeclaration vardecl);
-	void visit (VariableDerefrence varderef);
+	void visit (VariableDereference varderef);
 	void visit (WhileStatement whilestmt);
 }

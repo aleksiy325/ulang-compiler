@@ -80,8 +80,8 @@ compoundType returns [ CompoundType ctype ]
 
 statement returns [ Statement s ]
 options { backtrack = true; }
-  : ';' { s = new Statement(); } 
-  | lexpr=expr ';' { s = new Statement(lexpr); }
+  : ';' { s = new SimpleStatement(); } 
+  | lexpr=expr ';' { s = new SimpleStatement(lexpr); }
   | 'if' '(' lexpr=expr ')' ifblock=block  { s = new IfElseStatement(lexpr, ifblock); } ( 'else' elseblock=block { s = new IfElseStatement(lexpr, ifblock, elseblock); })? 
   | 'while' '(' lexpr=expr ')' lblock=block {s = new WhileStatement(lexpr, lblock); }
   | 'print' lexpr=expr ';' { s = new PrintStatement(lexpr); }
@@ -119,27 +119,27 @@ expr returns [ Expression rexpr ]
   ;
 
 cmpExpr returns [ CompareExpression cexpr ]
-  : fexpr=lessExpr {cexpr = new CompareExpression(fexpr); } ( '==' mexpr=lessExpr { cexpr.add(mexpr); } )* 
+  : lexpr=lessExpr { cexpr = new CompareExpression(lexpr); } ( '==' rexpr=lessExpr { cexpr = new CompareExpression(cexpr, rexpr); } )* 
   ;
 
 lessExpr returns [ LessThanExpression ltexpr ]
-  : fexpr=plusMinusExpr { ltexpr = new LessThanExpression(fexpr); } ( '<' mexpr=plusMinusExpr { ltexpr.add(mexpr); } )* 
+  : lexpr=plusMinusExpr { ltexpr = new LessThanExpression(lexpr); } ( '<' rexpr=plusMinusExpr { ltexpr = new LessThanExpression(ltexpr, rexpr);  } )* 
   ;
 
 plusMinusExpr returns [ PlusMinusExpression pmexpr ]
-  : fexpr=multiExpr  { pmexpr = new PlusMinusExpression(fexpr); } ( op=( '+' | '-' ) mexpr=multiExpr { pmexpr.add(mexpr, op.getText()); } )* 
+  : lexpr=multiExpr  { pmexpr = new PlusMinusExpression(lexpr); } ( op=( '+' | '-' ) rexpr=multiExpr { pmexpr =  new PlusMinusExpression(pmexpr, rexpr, op.getText()); } )* 
   ;
 
 multiExpr returns [ MultiplicationExpression mexpr ]
-  : a=atom { mexpr = new MultiplicationExpression(a); } ( '*' ab=atom  { mexpr.add(ab); } )* 
+  : la=atom { mexpr = new MultiplicationExpression(la); } ( '*' ra=atom  { mexpr = new MultiplicationExpression(mexpr, ra); } )* 
   ;
 
 atom returns [ Atom atom ]
   : cons=constant { atom = cons; }
   | '(' lexpr=expr ')' { atom = lexpr; }
   | id=identifier '(' exprl=exprList ')' { atom = new FunctionCall(id, exprl); }
-  | id=identifier '[' lexpr=expr ']' { atom = new ArrayDerefrence(id, lexpr); }
-  | id=identifier  { atom = new VariableDerefrence(id); }
+  | id=identifier '[' lexpr=expr ']' { atom = new ArrayDereference(id, lexpr); }
+  | id=identifier  { atom = new VariableDereference(id); }
   ;
 
 identifier returns [ Identifier id ]
@@ -160,11 +160,11 @@ TYPE
   ;
 
 constant returns [ Constant cons ]
-  : integerConstant 
-  | stringConstant
-  | floatConstant
-  | charConstant
-  | booleanConstant
+  : ic=integerConstant { cons = ic; }
+  | sc=stringConstant { cons = sc; }
+  | fc=floatConstant { cons = fc; }
+  | cc=charConstant { cons = cc; }
+  | bc=booleanConstant { cons = bc; }
   ;
 
 integerConstant returns [ IntegerConstant ic ]
@@ -180,7 +180,7 @@ floatConstant returns [ FloatConstant fc ]
   ;
 
 charConstant returns [ CharConstant cc ]
-  : val=CHAR_LITERAL { cc = new CharConstant(val.getText().charAt(0)); }
+  : val=CHAR_LITERAL { cc = new CharConstant(val.getText().charAt(1)); }
   ;
 
 booleanConstant returns [ BooleanConstant bc]

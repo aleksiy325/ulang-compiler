@@ -1,7 +1,7 @@
-public class VariableDerefrence extends Atom{
+public class VariableDereference extends Atom{
 	Identifier id;
 		
-	public VariableDerefrence (Identifier id){
+	public VariableDereference (Identifier id){
 		this.id = id;
 	}
 	

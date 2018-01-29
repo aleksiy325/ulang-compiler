@@ -1,8 +1,8 @@
 public class PrintStatement extends Statement {
-
+	Expression expr;
+	
 	public PrintStatement( Expression expr ){
 		this.expr = expr;
-		this.isEmpty = false;
 	}
 
 
