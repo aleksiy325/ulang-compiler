@@ -4,7 +4,7 @@ public class FormalParameterList extends BaseElement{
 	ArrayList<FormalParameter> parameterList;
 	
 	public FormalParameterList () {
-		parameterList = new ArrayList();
+		parameterList = new ArrayList<FormalParameter>();
 	}
 	
 	public void add (FormalParameter param) {

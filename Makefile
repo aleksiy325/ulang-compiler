@@ -53,6 +53,7 @@ reject:
 
 pretty:
 	mkdir -p tmp
+	@echo "---------------- Pretty Tests ----------------"
 	@let count=0; for f in ./$(PRETTY)/*.ul; do java $(PROG) $$f > ./$(TMP)/$$count.ul; diff -Z ./$(TMP)/$$count.ul $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi; ((count++)); done 
 
 test: generate accept reject
