@@ -1,11 +1,19 @@
-public class IntegerConstant extends Constant{
-	Integer val;
-		
-	public IntegerConstant (Integer val){
-		this.val = val;
-	}
+import java.util.Objects;
 
-	public void accept (Visitor v) {
-		v.visit(this);
-	}
+public class IntegerConstant extends Constant {
+    Integer val;
+    Type type;
+
+    public IntegerConstant (Integer val, String typeStr) {
+        this.val = val;
+        this.type = new Type(typeStr);
+    }
+
+    public void accept (Visitor v) {
+        v.visit(this);
+    }
+
+    public Type accept (TypeVisitor v) {
+        return v.visit(this);
+    }
 }

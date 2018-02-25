@@ -168,23 +168,23 @@ constant returns [ Constant cons ]
   ;
 
 integerConstant returns [ IntegerConstant ic ]
-  : val=INTEGER_LITERAL { ic = new IntegerConstant(Integer.parseInt(val.getText())); } 
+  : val=INTEGER_LITERAL { ic = new IntegerConstant(Integer.parseInt(val.getText()), "int"); } 
   ;
 
 stringConstant returns [ StringConstant sc ]
-  : val=STRING_LITERAL { sc = new StringConstant(val.getText()); }
+  : val=STRING_LITERAL { sc = new StringConstant(val.getText(), "string"); }
   ; 
 
 floatConstant returns [ FloatConstant fc ]
-  : val=FLOAT_LITERAL { fc = new FloatConstant(Float.parseFloat(val.getText())); }
+  : val=FLOAT_LITERAL { fc = new FloatConstant(Float.parseFloat(val.getText()), "float"); }
   ;
 
 charConstant returns [ CharConstant cc ]
-  : val=CHAR_LITERAL { cc = new CharConstant(val.getText().charAt(1)); }
+  : val=CHAR_LITERAL { cc = new CharConstant(val.getText().charAt(1), "char"); }
   ;
 
 booleanConstant returns [ BooleanConstant bc]
-  : val=BOOL_LITERAL { bc = new BooleanConstant(Boolean.parseBoolean(val.getText())); }
+  : val=BOOL_LITERAL { bc = new BooleanConstant(Boolean.parseBoolean(val.getText()), "boolean"); }
   ;
 
 BOOL_LITERAL : ('true' | 'false') ;

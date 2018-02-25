@@ -1,11 +1,17 @@
-public class BooleanConstant extends Constant{
-	Boolean val;
-		
-	public BooleanConstant (Boolean val){
-		this.val = val;
-	}
+public class BooleanConstant extends Constant {
+    Boolean val;
+    Type type;
 
-	public void accept (Visitor v) {
-		v.visit(this);
-	}
+    public BooleanConstant (Boolean val, String typeStr) {
+        this.val = val;
+        this.type = new Type(typeStr);
+    }
+
+    public void accept (Visitor v) {
+        v.visit(this);
+    }
+
+    public Type accept (TypeVisitor v) {
+        return v.visit(this);
+    }
 }

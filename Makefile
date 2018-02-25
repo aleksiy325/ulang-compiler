@@ -9,6 +9,7 @@ PROG = Compiler
 ACCEPT = $(TESTS)/accept
 REJECT = $(TESTS)/reject
 PRETTY = $(TESTS)/pretty
+TYPE = $(TESTS)/type
 ACCEPT_LINE = $(TESTS)/accept_line
 REJECT_LINE = $(TESTS)/reject_line
 GREEN=\e[0;32m
@@ -57,5 +58,8 @@ pretty:
 	@let count=0; for f in ./$(PRETTY)/*.ul; do java $(PROG) $$f > ./$(TMP)/$$count.ul; diff -Z ./$(TMP)/$$count.ul $$f; if [ $$? -eq 0 ]; then echo -e "${GREEN}PASSED${END} $$?" $$f; else echo -e "${RED}FAILED${END} $$?" $$f; fi; ((count++)); done 
 
 test: generate accept reject
+
+type: compiler
+	java $(PROG)  $(TYPE)/type_test.ul
 	
 
