@@ -61,5 +61,8 @@ test: generate accept reject
 
 type: clean grammar compiler
 	java $(PROG)  $(TYPE)/type_test.ul
+
+typetest:
+	@for f in ./tests/withoutSubtypes/*.ul; do echo $$f; java $(PROG) $$f; done;
 	
 

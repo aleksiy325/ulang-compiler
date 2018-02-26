@@ -9,6 +9,8 @@ public class ReturnStatement extends Statement {
     public ReturnStatement( Expression expr ) {
         this.expr = expr;
         this.isEmpty = false;
+        this.line = expr.line;
+        this.charPos = expr.charPos;
     }
 
     public void accept (Visitor v) {

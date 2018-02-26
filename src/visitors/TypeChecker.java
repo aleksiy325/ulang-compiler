@@ -1,9 +1,11 @@
 import java.util.ArrayList;
+import java.lang.Character;
 import java.io.*;
 
 public class TypeChecker implements TypeVisitor {
     Scope scope;
     ArrayList<String> lines;
+    Identifier main = new Identifier("main");
 
     public TypeChecker(InputStreamReader input) throws IOException {
         lines = new ArrayList<String>();
@@ -18,10 +20,11 @@ public class TypeChecker implements TypeVisitor {
 
     public void printError(int line, int charPos, String message) {
         System.out.println(line + ":" + charPos + " " + message);
-        System.out.println("    " + this.lines.get(line - 1).trim());
+        String strline = this.lines.get(line - 1);
+        System.out.println("    " + strline);
         String pad = "    ";
-        for (int i =  0; i < charPos - 1; i++) {
-            pad += " ";
+        for (int i = 0; i < charPos; i++) {
+            pad += ' ';
         }
         pad += "^";
         System.out.println(pad);
@@ -37,15 +40,34 @@ public class TypeChecker implements TypeVisitor {
             prog.get(i).accept(this);
         }
         this.scope.exitLocalScope();
+        FunctionSignature fs = new FunctionSignature(TypeDefs.voidType);
+
+        if (!this.scope.functionExists(this.main)) {
+            System.out.println("No main function found.");
+            return TypeDefs.voidType;
+        }
+
+        FunctionSignature candidate = this.scope.getFunctionSignature(this.main);
+
+        if (!fs.type.equals(candidate.type)) {
+            printError(candidate.line, candidate.charPos, "Main function has return type of " + "\"" + candidate.type + "\"" + " expected " + "\"" + fs.type + "\"");
+            return TypeDefs.voidType;
+        }
+
+        if (fs.paramsSize() != candidate.paramsSize()) {
+            printError(candidate.line, candidate.charPos, "Main function has " + candidate.paramsSize() + " parameters expected " + fs.paramsSize());
+            return TypeDefs.voidType;
+        }
+
         return TypeDefs.voidType;
     }
 
 
     public Type visit (Function func) {
-        this.scope.enterLocalScope(); // Corresponding exit in Function
+        this.scope.enterLocalScope();
         func.decl.accept(this);
         func.body.accept(this);
-        this.scope.exitLocalScope(); // Corresponding entry in FunctionDeclaration
+        this.scope.exitLocalScope();
         return TypeDefs.voidType;
     }
 
@@ -55,7 +77,7 @@ public class TypeChecker implements TypeVisitor {
             printError(fdecl.line, fdecl.charPos, "Function " + "\"" + fdecl.id  + "\"" + " redefines function in same scope");
         }
         ArrayList<Type> types = fdecl.params.accept(this);
-        FunctionSignature fs = new FunctionSignature(fdecl.type, types);
+        FunctionSignature fs = new FunctionSignature(fdecl.type, types, fdecl.id);
         this.scope.putGlobalFunction(fdecl.id, fs);
         return fdecl.type.accept(this);
     }
@@ -72,6 +94,10 @@ public class TypeChecker implements TypeVisitor {
     public Type visit (FormalParameter param) {
         if (scope.variableExists(param.id)) {
             printError(param.id.line, param.id.charPos, "Function parameter " + "\"" + param.id + "\"" + " redefines variable in same scope");
+            return param.type;
+        }
+        if (param.type.equals(TypeDefs.voidType)) {
+            printError(param.line, param.charPos, "Function parameter cannot be declared as type " + "\"" + TypeDefs.voidType + "\"" );
             return param.type;
         }
         scope.putLocalVariable(param.id, param.type);
@@ -105,6 +131,11 @@ public class TypeChecker implements TypeVisitor {
             printError(vardecl.line, vardecl.charPos, "Local variable declaration " + "\"" + vardecl.id + "\"" + " redefines variable in same scope");
             return vardecl.type;
         }
+        if (vardecl.type.equals(TypeDefs.voidType)) {
+            printError(vardecl.line, vardecl.charPos, "Local variable cannot be declared as type " + "\"" + TypeDefs.voidType + "\"" );
+            return vardecl.type;
+        }
+
         this.scope.putLocalVariable(vardecl.id, vardecl.type);
         return vardecl.type;
     }
@@ -123,13 +154,12 @@ public class TypeChecker implements TypeVisitor {
             astmtType = this.scope.getVariableType(astmt.id);
         }
 
-
         if (!TypeTables.AssignmentTable.isCompatible(astmtType, exprType)) {
             exprError(astmt.line, astmt.charPos, astmtType, exprType, "=");
-            return astmtType;
+            return exprType;
         }
 
-        return astmtType;
+        return exprType;
     }
 
 
@@ -170,6 +200,7 @@ public class TypeChecker implements TypeVisitor {
         Type etype = arrd.expr.accept(this);
         if (TypeDefs.integerType != etype) {
             printError(arrd.line, arrd.charPos, "Attempted to dereference array " + "\"" + arrd.id + "\"" + " incompatible expression type "  + "\"" + etype + "\"");
+            return TypeDefs.voidType;
         }
 
         Type arrayType = this.scope.getVariableType(arrd.id);
@@ -181,8 +212,10 @@ public class TypeChecker implements TypeVisitor {
         Type ltype = expr.left.accept(this);
         if ( expr.right != null ) {
             Type rtype = expr.right.accept(this);
+
             if (!TypeTables.EqualityTable.isCompatible(ltype, rtype)) {
-                exprError(expr.line, expr.charPos, ltype, rtype, "== ");
+                exprError(expr.line, expr.charPos, ltype, rtype, "==");
+                return ltype;
             }
             return TypeTables.EqualityTable.get(ltype, rtype);
         }
@@ -198,6 +231,14 @@ public class TypeChecker implements TypeVisitor {
     }
 
     public Type visit (IfElseStatement ifelsestmt) {
+        Type wexpr = ifelsestmt.expr.accept(this);
+        if (!wexpr.equals(TypeDefs.booleanType)) {
+            printError(ifelsestmt.line, ifelsestmt.charPos, "If statement expression is of type \"" + wexpr + "\" expected \"" + TypeDefs.booleanType + "\"");
+        }
+        ifelsestmt.ifblock.accept(this);
+        if (ifelsestmt.hasElse) {
+            ifelsestmt.elseblock.accept(this);
+        }
         return TypeDefs.voidType;
     }
 
@@ -248,10 +289,20 @@ public class TypeChecker implements TypeVisitor {
     }
 
     public Type visit (PrintlnStatement println) {
+        Type type = println.expr.accept(this);
+        if (!StatementDefs.printable.contains(type)) {
+            printError(println.line, println.charPos, "Attempting to print unprintable type " + "\"" + type + "\"");
+
+        }
         return TypeDefs.voidType;
     }
 
     public Type visit (PrintStatement print) {
+        Type type = print.expr.accept(this);
+        if (!StatementDefs.printable.contains(type)) {
+            printError(print.line, print.charPos, "Attempting to print unprintable type " + "\"" + type + "\"");
+
+        }
         return TypeDefs.voidType;
     }
 

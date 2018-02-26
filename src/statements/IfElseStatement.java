@@ -8,6 +8,8 @@ public class IfElseStatement extends Statement {
         this.expr = expr;
         this.ifblock = ifblock;
         this.hasElse = false;
+        this.line = expr.line;
+        this.charPos = expr.charPos;
     }
 
     public IfElseStatement(Expression expr, Block ifblock, Block elseblock) {
@@ -15,6 +17,8 @@ public class IfElseStatement extends Statement {
         this.ifblock = ifblock;
         this.elseblock = elseblock;
         this.hasElse = true;
+        this.line = expr.line;
+        this.charPos = expr.charPos;
     }
 
     public void accept (Visitor v) {

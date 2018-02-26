@@ -3,6 +3,8 @@ public class PrintlnStatement extends Statement {
 
     public PrintlnStatement( Expression expr ) {
         this.expr = expr;
+        this.line = expr.line;
+        this.charPos = expr.charPos;
     }
 
     public void accept (Visitor v) {

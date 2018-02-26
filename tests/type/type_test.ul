@@ -1,28 +1,43 @@
 void main(int a, int b){
-	int a;
-	int c;
-	int[10] e;
-	a = 0;
-	a = 1 < false;
-	a = false * false;
-	d = 0;
-	c = a == b;
-	e = 10;
-	e[2] = 10;
-	e[false] = 10;
-	e[2] = true;
-	main(a, b);
-	main();
-	main(a, c);
-	main(a, e);
+    int a;
+    int c;
+    int[10] e;
+    boolean bool;
+    float f;
+    a = 0;
+    a = 1 < false;
+    a = false * false;
+    d = 0;
+    c = a == b;
+    c = f < bool;
+    e = 10;
+    e[2] = 10;
+    e[false] = 10;
+    e[2] = true;
+    main(a, b);
+    main();
+    main(a, c);
+    main(a, e);
 }
 
 void main(int a, int b){
-	while(1){
-		while(true){
-		
-		}
-	}
+    while(1){
+        while(true){
+        
+        }
+    }
 
+    if(1){
 
+    }else{
+        if("str"){
+        
+        }
+    }
+
+    println "test";
+    println main(a, b);
+    print "test";
+    print main(a, b);
+    a = (s1 == i);
 }
