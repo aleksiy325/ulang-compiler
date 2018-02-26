@@ -1,8 +1,8 @@
 public class VariableDeclaration extends BaseElement {
-    CompoundType type;
+    Type type;
     Identifier id;
 
-    public VariableDeclaration (CompoundType type, Identifier id) {
+    public VariableDeclaration (Type type, Identifier id) {
         this.type = type;
         this.id = id;
     }
@@ -11,7 +11,7 @@ public class VariableDeclaration extends BaseElement {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

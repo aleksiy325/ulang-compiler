@@ -1,19 +1,19 @@
 import java.util.HashMap;
 
 public class ScopeFrame {
-    private HashMap<Identifier, CompoundType> functionMap;
-    private HashMap<Identifier, CompoundType> varMap;
+    private HashMap<Identifier, Type> functionMap;
+    private HashMap<Identifier, Type> varMap;
 
     public ScopeFrame() {
-        functionMap = new HashMap<Identifier, CompoundType>();
-        varMap = new HashMap<Identifier, CompoundType>();
+        functionMap = new HashMap<Identifier, Type>();
+        varMap = new HashMap<Identifier, Type>();
     }
 
-    public void putFunction(Identifier id, CompoundType type) {
+    public void putFunction(Identifier id, Type type) {
         functionMap.put(id, type);
     }
 
-    public void putVariable(Identifier id, CompoundType type) {
+    public void putVariable(Identifier id, Type type) {
         varMap.put(id, type);
     }
 
@@ -25,11 +25,11 @@ public class ScopeFrame {
         return varMap.containsKey(id);
     }
 
-    public CompoundType getFunctionType(Identifier id) {
+    public Type getFunctionType(Identifier id) {
         return functionMap.get(id);
     }
 
-    public CompoundType getVariableType(Identifier id) {
+    public Type getVariableType(Identifier id) {
         return varMap.get(id);
     }
 }

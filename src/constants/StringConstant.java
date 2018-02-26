@@ -1,17 +1,17 @@
 public class StringConstant extends Constant {
     String val;
-    CompoundType type;
+    final Type type = TypeDefs.stringType;
 
-    public StringConstant (String val, String typeStr) {
+
+    public StringConstant (String val) {
         this.val = val;
-        this.type = new CompoundType(typeStr);
     }
 
     public void accept (Visitor v) {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

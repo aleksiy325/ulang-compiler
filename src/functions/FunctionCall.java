@@ -11,7 +11,7 @@ public class FunctionCall extends Atom {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

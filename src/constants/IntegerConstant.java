@@ -2,18 +2,17 @@ import java.util.Objects;
 
 public class IntegerConstant extends Constant {
     Integer val;
-    CompoundType type;
+    final Type type = TypeDefs.integerType;
 
-    public IntegerConstant (Integer val, String typeStr) {
+    public IntegerConstant (Integer val) {
         this.val = val;
-        this.type = new CompoundType(typeStr);
     }
 
     public void accept (Visitor v) {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

@@ -1,9 +1,9 @@
 public class FunctionDeclaration extends BaseElement {
-    CompoundType type;
+    Type type;
     Identifier id;
     FormalParameterList params;
 
-    public FunctionDeclaration (CompoundType type, Identifier id, FormalParameterList params) {
+    public FunctionDeclaration (Type type, Identifier id, FormalParameterList params) {
         this.type = type;
         this.id = id;
         this.params = params;
@@ -13,7 +13,7 @@ public class FunctionDeclaration extends BaseElement {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

@@ -6,107 +6,26 @@ public class TypeChecker implements TypeVisitor {
         scope = new Scope();
     }
 
-    public CompoundType visit (ArrayDereference arrd) {
-        arrd.id.accept(this);
-        arrd.expr.accept(this);
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (AssignmentStatement astmt) {
-        astmt.id.accept(this);
-        if ( astmt.isArray ) {
-            astmt.size.accept(this);
-        }
-        astmt.expr.accept(this);
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (Block block) {
+    public Type visit (Program prog) {
         this.scope.enterLocalScope();
-        for (int i = 0; i < block.size(); i++) {
-            block.get(i).accept(this);
+        for (int i = 0; i < prog.size(); i++) {
+            prog.get(i).accept(this);
         }
         this.scope.exitLocalScope();
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (BooleanConstant bool) {
-        return bool.type;
-    }
-
-    public CompoundType visit (CharConstant character) {
-        return character.type;
-    }
-
-    public CompoundType visit (CompareExpression expr) {
-        expr.left.accept(this);
-        if ( expr.right != null ) {
-            expr.right.accept(this);
-        }
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (CompoundType ctype) {
-        ctype.type.accept(this);
-        if ( ctype.isArray ) {
-            ctype.size.accept(this);
-        }
-        return ctype;
+        return new Type("null");
     }
 
 
-    public CompoundType visit (ExpressionList exprlist) {
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (FloatConstant cfloat) {
-        return cfloat.type;
-    }
-
-    public CompoundType visit (FormalParameter param) {
-        if (scope.variableExists(param.id)) {
-            System.out.println("Function parameter redefines variable in same scope.");
-        }
-        scope.putLocalVariable(param.id, param.type);
-        // param.type.accept(this);
-        // param.id.accept(this);
-        return param.type;
-    }
-
-    public CompoundType visit (FormalParameterList params) {
-        for (int i = 0; i < params.size(); i++) {
-            params.get(i).accept(this);
-        }
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (Function func) {
+    public Type visit (Function func) {
         this.scope.enterLocalScope();
         func.decl.accept(this);
         func.body.accept(this);
         this.scope.exitLocalScope();
-        return new CompoundType("null");
+        return new Type("null");
     }
 
-    public CompoundType visit (FunctionBody body) {
-        for (int i = 0; i < body.varDeclSize(); i++) {
-            body.getVarDecl(i).accept(this);
-        }
-        for (int i = 0; i < body.statementSize(); i++) {
-            body.getStatementList(i).accept(this);
-        }
-        return new CompoundType("null");
-    }
 
-    public CompoundType visit (FunctionCall funccall) {
-        funccall.id.accept(this);
-        for (int i = 0; i < funccall.exprs.size(); i++) {
-            funccall.exprs.get(i).accept(this);
-        }
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (FunctionDeclaration fdecl) {
+    public Type visit (FunctionDeclaration fdecl) {
         if (this.scope.functionExists(fdecl.id)) {
             System.out.println("Duplicate function");
         }
@@ -118,86 +37,46 @@ public class TypeChecker implements TypeVisitor {
     }
 
 
-    public CompoundType visit (Identifier id) {
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (IfElseStatement ifelsestmt) {
-        ifelsestmt.expr.accept(this);
-        ifelsestmt.ifblock.accept(this);
-        if ( ifelsestmt.hasElse ) {
-            ifelsestmt.elseblock.accept(this);
+    public Type visit (FormalParameterList params) {
+        for (int i = 0; i < params.size(); i++) {
+            params.get(i).accept(this);
         }
-        return new CompoundType("null");
+        return TypeDefs.voidType;
     }
 
-    public CompoundType visit (IntegerConstant cint) {
-        return cint.type;
-    }
-
-    public CompoundType visit (LessThanExpression expr) {
-        expr.left.accept(this);
-        if ( expr.right != null ) {
-            expr.right.accept(this);
+    public Type visit (FormalParameter param) {
+        if (scope.variableExists(param.id)) {
+            System.out.println("Function parameter redefines variable in same scope.");
         }
-        return new CompoundType("null");
+        scope.putLocalVariable(param.id, param.type);
+        // param.type.accept(this);
+        // param.id.accept(this);
+        return param.type;
     }
 
-    public CompoundType visit (MultiplicationExpression expr) {
-        expr.left.accept(this);
-        if ( expr.right != null ) {
-            expr.right.accept(this);
+
+    public Type visit (FunctionBody body) {
+        for (int i = 0; i < body.varDeclSize(); i++) {
+            body.getVarDecl(i).accept(this);
         }
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (PlusMinusExpression expr) {
-        expr.left.accept(this);
-        if ( expr.right != null ) {
-            expr.right.accept(this);
+        for (int i = 0; i < body.statementSize(); i++) {
+            body.getStatementList(i).accept(this);
         }
-        return new CompoundType("null");
+        return new Type("null");
     }
 
-    public CompoundType visit (PrintlnStatement println) {
-        println.expr.accept(this);
-        return new CompoundType("null");
-    }
 
-    public CompoundType visit (PrintStatement print) {
-        print.expr.accept(this);
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (Program prog) {
+    public Type visit (Block block) {
         this.scope.enterLocalScope();
-        for (int i = 0; i < prog.size(); i++) {
-            prog.get(i).accept(this);
+        for (int i = 0; i < block.size(); i++) {
+            block.get(i).accept(this);
         }
         this.scope.exitLocalScope();
-        return new CompoundType("null");
+        return new Type("null");
     }
 
-    public CompoundType visit (ReturnStatement retstmt) {
-        if ( !retstmt.isEmpty ) {
-            retstmt.expr.accept(this);
-        }
-        return new CompoundType("null");
-    }
 
-    public CompoundType visit (SimpleStatement stmt) {
-        return new CompoundType("null");
-    }
-
-    public CompoundType visit (StringConstant cstring) {
-        return cstring.type;
-    }
-
-    public CompoundType visit (Type type) {
-        return new CompoundType(type);
-    }
-
-    public CompoundType visit (VariableDeclaration vardecl) {
+    public Type visit (VariableDeclaration vardecl) {
         if (this.scope.variableExists(vardecl.id)) {
             System.out.println("Redefinition of variable.");
         }
@@ -206,15 +85,92 @@ public class TypeChecker implements TypeVisitor {
         return vardecl.type;
     }
 
-    public CompoundType visit (VariableDereference varderef) {
-        varderef.id.accept(this);
-        return new CompoundType("null");
+
+    public Type visit (AssignmentStatement astmt) {
+        if (!this.scope.variableExists(astmt.id)) {
+            System.out.println("Variable does not exist");
+        }
+
+        return TypeDefs.voidType;
     }
 
-    public CompoundType visit (WhileStatement whilestmt) {
-        whilestmt.expr.accept(this);
-        whilestmt.block.accept(this);
-        return new CompoundType("null");
+
+    public Type visit (IntegerConstant cint) {
+        return cint.type;
+    }
+
+
+    public Type visit (FloatConstant cfloat) {
+        return cfloat.type;
+    }
+
+
+    public Type visit (BooleanConstant bool) {
+        return bool.type;
+    }
+
+
+    public Type visit (CharConstant character) {
+        return character.type;
+    }
+
+    public Type visit (StringConstant cstring) {
+        return cstring.type;
+    }
+
+    public Type visit (Type type) {
+        return type;
+    }
+
+    public Type visit (ArrayDereference arrd) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (CompareExpression cmpexpr) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (ExpressionList exprlist) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (IfElseStatement ifelsestmt) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (LessThanExpression ltexpr) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (MultiplicationExpression mexpr) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (PlusMinusExpression pmexpr) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (PrintlnStatement println) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (PrintStatement print) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (ReturnStatement retstmt) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (SimpleStatement stmt) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (PrimitiveType type) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (VariableDereference varderef) {
+        return TypeDefs.voidType;
+    }
+    public Type visit (WhileStatement whilestmt) {
+        return TypeDefs.voidType;
+    }
+
+    public Type visit (FunctionCall funccall) {
+        return TypeDefs.voidType;
+    }
+
+    public Type visit (Identifier id) {
+        return TypeDefs.voidType;
     }
 
 }

@@ -1,15 +1,40 @@
 import java.util.Objects;
 
-public class Type extends BaseElement implements Comparable<Type> {
-    String val;
+public class Type extends BaseElement implements Comparable<Type>  {
+    PrimitiveType primType;
+    IntegerConstant size;
+    boolean isArray;
+    int iSize;
 
-    public Type (String val) {
-        this.val = val;
+    public Type (String id) {
+        isArray = false;
+        this.primType = new PrimitiveType(id);
+        this.iSize = 1;
+    }
+
+    public Type (PrimitiveType primType) {
+        isArray = false;
+        this.primType = primType;
+        this.iSize = 1;
+    }
+
+    public void makeArray (IntegerConstant size) {
+        this.isArray = true;
+        this.size = size;
+        this.iSize = size.val;
     }
 
     @Override
     public int compareTo(Type other) {
-        return this.val.compareTo(other.val);
+        int cmp = this.primType.compareTo(other.primType);
+        if (cmp != 0) return cmp;
+        Boolean a = new Boolean(this.isArray);
+        Boolean b = new Boolean(other.isArray);
+        cmp = a.compareTo(b);
+        if (cmp != 0) return cmp;
+        Integer sa = this.iSize;
+        Integer sb = other.iSize;
+        return sa.compareTo(sb);
     }
 
     @Override
@@ -18,19 +43,20 @@ public class Type extends BaseElement implements Comparable<Type> {
         if (obj == this) return true;
         if (!(obj instanceof Type)) return false;
         Type other = (Type) obj;
-        return this.val.equals(other.val);
+        return this.primType.equals(other.primType) && this.size == other.size && this.isArray == other.isArray;
     }
 
     @Override
     public int hashCode() {
-        return this.val.hashCode();
+        return Objects.hash(this.primType, this.size, this.isArray);
     }
+
 
     public void accept (Visitor v) {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

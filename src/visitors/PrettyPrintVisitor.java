@@ -97,7 +97,7 @@ public class PrettyPrintVisitor implements Visitor {
         }
     }
 
-    public void visit (CompoundType ctype) {
+    public void visit (Type ctype) {
         ctype.type.accept(this);
         if ( ctype.isArray ) {
             System.out.print(LSQR);

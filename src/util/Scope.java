@@ -17,19 +17,19 @@ public class Scope {
         local.pop();
     }
 
-    public void putGlobalFunction(Identifier id, CompoundType type) {
+    public void putGlobalFunction(Identifier id, Type type) {
         global.putFunction(id, type);
     }
 
-    public void putGlobalVariable(Identifier id, CompoundType type) {
+    public void putGlobalVariable(Identifier id, Type type) {
         global.putVariable(id, type);
     }
 
-    public void putLocalFunction(Identifier id, CompoundType type) {
+    public void putLocalFunction(Identifier id, Type type) {
         local.peek().putFunction(id, type);
     }
 
-    public void putLocalVariable(Identifier id, CompoundType type) {
+    public void putLocalVariable(Identifier id, Type type) {
         local.peek().putVariable(id, type);
     }
 
@@ -58,7 +58,7 @@ public class Scope {
         return false;
     }
 
-    public CompoundType getFunctionType(Identifier id) {
+    public Type getFunctionType(Identifier id) {
         if (global.containsFunction(id)) {
             return global.getFunctionType(id);
         }
@@ -70,7 +70,7 @@ public class Scope {
         return null;
     }
 
-    public CompoundType getVariableType(Identifier id) {
+    public Type getVariableType(Identifier id) {
         if (global.containsVariable(id)) {
             return global.getVariableType(id);
         }

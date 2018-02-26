@@ -1,18 +1,16 @@
 public class CharConstant extends Constant {
     char val;
-    CompoundType type;
+    final Type type = TypeDefs.charType;
 
-    public CharConstant (char val, String typeStr) {
+    public CharConstant (char val) {
         this.val = val;
-        this.type = new CompoundType(typeStr);
-
     }
 
     public void accept (Visitor v) {
         v.visit(this);
     }
 
-    public CompoundType accept (TypeVisitor v) {
+    public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

@@ -5,7 +5,6 @@ public interface Visitor {
     void visit (BooleanConstant bool);
     void visit (CharConstant character);
     void visit (CompareExpression cmpexpr);
-    void visit (CompoundType ctype);
     void visit (ExpressionList exprlist);
     void visit (FloatConstant cfloat);
     void visit (FormalParameter param);
@@ -27,6 +26,7 @@ public interface Visitor {
     void visit (SimpleStatement stmt);
     void visit (StringConstant cstring);
     void visit (Type type);
+    void visit (PrimitiveType type);
     void visit (VariableDeclaration vardecl);
     void visit (VariableDereference varderef);
     void visit (WhileStatement whilestmt);

@@ -74,8 +74,9 @@ varDecl returns [ VariableDeclaration vdecl]
   ctype=compoundType id=identifier ';' { vdecl = new VariableDeclaration(ctype, id); }
   ;
 
-compoundType returns [ CompoundType ctype ]
-  : ttype=type { ctype = new CompoundType(ttype); } ( '[' lint=integerConstant ']' { ctype.makeArray(lint); } )? 
+compoundType returns [ Type ctype ]
+  : 
+  ntype = type { ctype = ntype; } ( '[' lint=integerConstant ']' { ctype.makeArray(lint); } )? 
   ;
 
 statement returns [ Statement s ]
@@ -147,16 +148,12 @@ identifier returns [ Identifier id ]
   ;
 
 type returns [ Type t]
-  : val=TYPE { t = new Type(val.getText()); } 
-  ;
-
-TYPE
-  : 'int'
-  | 'float'
-  | 'char'
-  | 'string'
-  | 'boolean'
-  | 'void'
+  : 'int'  { t = TypeDefs.integerType; }
+  | 'float'  { t = TypeDefs.floatType; } 
+  | 'char' { t = TypeDefs.charType; } 
+  | 'string' { t = TypeDefs.stringType; } 
+  | 'boolean' { t = TypeDefs.booleanType; } 
+  | 'void' { t = TypeDefs.voidType; } 
   ;
 
 constant returns [ Constant cons ]
@@ -168,23 +165,23 @@ constant returns [ Constant cons ]
   ;
 
 integerConstant returns [ IntegerConstant ic ]
-  : val=INTEGER_LITERAL { ic = new IntegerConstant(Integer.parseInt(val.getText()), "int"); } 
+  : val=INTEGER_LITERAL { ic = new IntegerConstant(Integer.parseInt(val.getText())); } 
   ;
 
 stringConstant returns [ StringConstant sc ]
-  : val=STRING_LITERAL { sc = new StringConstant(val.getText(), "string"); }
+  : val=STRING_LITERAL { sc = new StringConstant(val.getText()); }
   ; 
 
 floatConstant returns [ FloatConstant fc ]
-  : val=FLOAT_LITERAL { fc = new FloatConstant(Float.parseFloat(val.getText()), "float"); }
+  : val=FLOAT_LITERAL { fc = new FloatConstant(Float.parseFloat(val.getText())); }
   ;
 
 charConstant returns [ CharConstant cc ]
-  : val=CHAR_LITERAL { cc = new CharConstant(val.getText().charAt(1), "char"); }
+  : val=CHAR_LITERAL { cc = new CharConstant(val.getText().charAt(1)); }
   ;
 
 booleanConstant returns [ BooleanConstant bc]
-  : val=BOOL_LITERAL { bc = new BooleanConstant(Boolean.parseBoolean(val.getText()), "boolean"); }
+  : val=BOOL_LITERAL { bc = new BooleanConstant(Boolean.parseBoolean(val.getText())); }
   ;
 
 BOOL_LITERAL : ('true' | 'false') ;
