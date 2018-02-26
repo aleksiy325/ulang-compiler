@@ -1,10 +1,10 @@
 public class CharConstant extends Constant {
     char val;
-    Type type;
+    CompoundType type;
 
     public CharConstant (char val, String typeStr) {
         this.val = val;
-        this.type = new Type(typeStr);
+        this.type = new CompoundType(typeStr);
 
     }
 
@@ -12,7 +12,7 @@ public class CharConstant extends Constant {
         v.visit(this);
     }
 
-    public Type accept (TypeVisitor v) {
+    public CompoundType accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

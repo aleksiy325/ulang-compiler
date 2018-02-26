@@ -23,7 +23,7 @@ public class Program extends BaseElement {
         v.visit(this);
     }
 
-    public Type accept (TypeVisitor v) {
+    public CompoundType accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

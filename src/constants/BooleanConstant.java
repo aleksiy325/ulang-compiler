@@ -1,17 +1,17 @@
 public class BooleanConstant extends Constant {
     Boolean val;
-    Type type;
+    CompoundType type;
 
     public BooleanConstant (Boolean val, String typeStr) {
         this.val = val;
-        this.type = new Type(typeStr);
+        this.type = new CompoundType(typeStr);
     }
 
     public void accept (Visitor v) {
         v.visit(this);
     }
 
-    public Type accept (TypeVisitor v) {
+    public CompoundType accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

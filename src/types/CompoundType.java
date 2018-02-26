@@ -6,6 +6,12 @@ public class CompoundType extends BaseElement implements Comparable<CompoundType
     boolean isArray;
     int iSize;
 
+    public CompoundType (String val) {
+        isArray = false;
+        this.type = new Type(val);
+        this.iSize = 1;
+    }
+
     public CompoundType (Type type) {
         isArray = false;
         this.type = type;
@@ -50,7 +56,7 @@ public class CompoundType extends BaseElement implements Comparable<CompoundType
         v.visit(this);
     }
 
-    public Type accept (TypeVisitor v) {
+    public CompoundType accept (TypeVisitor v) {
         return v.visit(this);
     }
 }
