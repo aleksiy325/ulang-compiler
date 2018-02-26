@@ -7,6 +7,8 @@ public class FunctionDeclaration extends BaseElement {
         this.type = type;
         this.id = id;
         this.params = params;
+        this.line = id.line;
+        this.charPos = id.charPos;
     }
 
     public void accept (Visitor v) {

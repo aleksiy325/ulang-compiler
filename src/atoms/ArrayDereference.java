@@ -5,6 +5,8 @@ public class ArrayDereference extends Atom {
     public ArrayDereference (Identifier id, Expression expr) {
         this.id = id;
         this.expr = expr;
+        this.line = id.line;
+        this.charPos = id.charPos;
     }
 
     public void accept (Visitor v) {

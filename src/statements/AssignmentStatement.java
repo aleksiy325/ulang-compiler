@@ -1,6 +1,6 @@
 public class AssignmentStatement extends Statement {
     Identifier id;
-    Expression size;
+    ArrayDereference deref;
     Expression expr;
     boolean isArray;
 
@@ -8,13 +8,17 @@ public class AssignmentStatement extends Statement {
         this.id = id;
         this.expr = expr;
         this.isArray = false;
+        this.line = id.line;
+        this.charPos = id.charPos;
     }
 
     public AssignmentStatement(Identifier id, Expression size, Expression expr) {
         this.id = id;
-        this.size = size;
         this.expr = expr;
-        this.isArray = false;
+        this.isArray = true;
+        this.deref = new ArrayDereference(id, size);
+        this.line = id.line;
+        this.charPos = id.charPos;
     }
 
     public void accept (Visitor v) {

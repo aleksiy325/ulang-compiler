@@ -17,16 +17,16 @@ public class Scope {
         local.pop();
     }
 
-    public void putGlobalFunction(Identifier id, Type type) {
-        global.putFunction(id, type);
+    public void putGlobalFunction(Identifier id, FunctionSignature fs) {
+        global.putFunction(id, fs);
     }
 
     public void putGlobalVariable(Identifier id, Type type) {
         global.putVariable(id, type);
     }
 
-    public void putLocalFunction(Identifier id, Type type) {
-        local.peek().putFunction(id, type);
+    public void putLocalFunction(Identifier id, FunctionSignature fs) {
+        local.peek().putFunction(id, fs);
     }
 
     public void putLocalVariable(Identifier id, Type type) {
@@ -58,13 +58,13 @@ public class Scope {
         return false;
     }
 
-    public Type getFunctionType(Identifier id) {
+    public FunctionSignature getFunctionSignature(Identifier id) {
         if (global.containsFunction(id)) {
-            return global.getFunctionType(id);
+            return global.getFunctionSignature(id);
         }
         for (ScopeFrame frame : local) {
             if (frame.containsFunction(id)) {
-                return frame.getFunctionType(id);
+                return frame.getFunctionSignature(id);
             }
         }
         return null;

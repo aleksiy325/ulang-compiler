@@ -2,9 +2,14 @@ public class StringConstant extends Constant {
     String val;
     final Type type = TypeDefs.stringType;
 
-
     public StringConstant (String val) {
         this.val = val;
+    }
+
+    public StringConstant (String val, int line, int charPos) {
+        this.val = val;
+        this.charPos = charPos;
+        this.line = line;
     }
 
     public void accept (Visitor v) {

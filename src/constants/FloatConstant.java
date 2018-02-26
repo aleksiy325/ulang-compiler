@@ -6,6 +6,12 @@ public class FloatConstant extends Constant {
         this.val = val;
     }
 
+    public FloatConstant (Float val, int line, int charPos) {
+        this.val = val;
+        this.charPos = charPos;
+        this.line = line;
+    }
+
     public void accept (Visitor v) {
         v.visit(this);
     }

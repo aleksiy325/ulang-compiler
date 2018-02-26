@@ -1,5 +1,18 @@
 public class Identifier extends BaseElement implements Comparable<Identifier> {
     String val;
+    int line;
+    int charPos;
+
+
+    public Identifier (String val) {
+        this.val = val;
+    }
+
+    public Identifier (String val, int line, int charPos) {
+        this.val = val;
+        this.line = line;
+        this.charPos = charPos;
+    }
 
     @Override
     public int compareTo(Identifier other) {
@@ -20,10 +33,6 @@ public class Identifier extends BaseElement implements Comparable<Identifier> {
         return this.val.hashCode();
     }
 
-    public Identifier (String val) {
-        this.val = val;
-    }
-
     public void accept (Visitor v) {
         v.visit(this);
     }
@@ -31,4 +40,9 @@ public class Identifier extends BaseElement implements Comparable<Identifier> {
     public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
+
+    public String toString() {
+        return this.val;
+    }
 }
+

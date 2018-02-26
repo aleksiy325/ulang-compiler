@@ -4,11 +4,15 @@ public class MultiplicationExpression extends Expression {
 
     public MultiplicationExpression (Atom left) {
         this.left = left;
+        this.line = left.line;
+        this.charPos = left.charPos;
     }
 
     public MultiplicationExpression (Atom left, Atom right) {
         this.left = left;
         this.right = right;
+        this.line = left.line;
+        this.charPos = left.charPos;
     }
 
     public void accept (Visitor v) {

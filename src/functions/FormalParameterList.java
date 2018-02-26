@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class FormalParameterList extends BaseElement {
+public class FormalParameterList {
     ArrayList<FormalParameter> parameterList;
 
     public FormalParameterList () {
@@ -23,7 +23,7 @@ public class FormalParameterList extends BaseElement {
         v.visit(this);
     }
 
-    public Type accept (TypeVisitor v) {
+    public ArrayList<Type> accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

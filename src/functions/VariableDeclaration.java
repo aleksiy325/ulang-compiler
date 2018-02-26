@@ -5,6 +5,8 @@ public class VariableDeclaration extends BaseElement {
     public VariableDeclaration (Type type, Identifier id) {
         this.type = type;
         this.id = id;
+        this.line = id.line;
+        this.charPos = id.charPos;
     }
 
     public void accept (Visitor v) {

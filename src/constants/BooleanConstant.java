@@ -6,6 +6,12 @@ public class BooleanConstant extends Constant {
         this.val = val;
     }
 
+    public BooleanConstant (Boolean val, int line, int charPos) {
+        this.val = val;
+        this.charPos = charPos;
+        this.line = line;
+    }
+
     public void accept (Visitor v) {
         v.visit(this);
     }

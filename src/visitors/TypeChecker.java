@@ -1,9 +1,34 @@
+import java.util.ArrayList;
+import java.io.*;
 
 public class TypeChecker implements TypeVisitor {
     Scope scope;
+    ArrayList<String> lines;
 
-    public TypeChecker() {
+    public TypeChecker(InputStreamReader input) throws IOException {
+        lines = new ArrayList<String>();
+        BufferedReader br = new BufferedReader(input);
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            lines.add(line);
+        }
+        br.close();
         scope = new Scope();
+    }
+
+    public void printError(int line, int charPos, String message) {
+        System.out.println(line + ":" + charPos + " " + message);
+        System.out.println("    " + this.lines.get(line - 1).trim());
+        String pad = "    ";
+        for (int i =  0; i < charPos - 1; i++) {
+            pad += " ";
+        }
+        pad += "^";
+        System.out.println(pad);
+    }
+
+    public void exprError(int line, int charPos, Type ltype, Type rtype, String operator) {
+        printError(line, charPos, "Incompatible types " + "\"" + ltype  + "\"" + " and " + "\"" + rtype + "\"" + " for operator " + operator);
     }
 
     public Type visit (Program prog) {
@@ -12,45 +37,44 @@ public class TypeChecker implements TypeVisitor {
             prog.get(i).accept(this);
         }
         this.scope.exitLocalScope();
-        return new Type("null");
+        return TypeDefs.voidType;
     }
 
 
     public Type visit (Function func) {
-        this.scope.enterLocalScope();
+        this.scope.enterLocalScope(); // Corresponding exit in Function
         func.decl.accept(this);
         func.body.accept(this);
-        this.scope.exitLocalScope();
-        return new Type("null");
+        this.scope.exitLocalScope(); // Corresponding entry in FunctionDeclaration
+        return TypeDefs.voidType;
     }
 
 
     public Type visit (FunctionDeclaration fdecl) {
         if (this.scope.functionExists(fdecl.id)) {
-            System.out.println("Duplicate function");
+            printError(fdecl.line, fdecl.charPos, "Function " + "\"" + fdecl.id  + "\"" + " redefines function in same scope");
         }
-        this.scope.putLocalFunction(fdecl.id, fdecl.type);
-
-        //fdecl.id.accept(this);
-        fdecl.params.accept(this);
+        ArrayList<Type> types = fdecl.params.accept(this);
+        FunctionSignature fs = new FunctionSignature(fdecl.type, types);
+        this.scope.putGlobalFunction(fdecl.id, fs);
         return fdecl.type.accept(this);
     }
 
 
-    public Type visit (FormalParameterList params) {
+    public ArrayList<Type> visit (FormalParameterList params) {
+        ArrayList<Type> types = new ArrayList<Type>();
         for (int i = 0; i < params.size(); i++) {
-            params.get(i).accept(this);
+            types.add(params.get(i).accept(this));
         }
-        return TypeDefs.voidType;
+        return types;
     }
 
     public Type visit (FormalParameter param) {
         if (scope.variableExists(param.id)) {
-            System.out.println("Function parameter redefines variable in same scope.");
+            printError(param.id.line, param.id.charPos, "Function parameter " + "\"" + param.id + "\"" + " redefines variable in same scope");
+            return param.type;
         }
         scope.putLocalVariable(param.id, param.type);
-        // param.type.accept(this);
-        // param.id.accept(this);
         return param.type;
     }
 
@@ -62,7 +86,7 @@ public class TypeChecker implements TypeVisitor {
         for (int i = 0; i < body.statementSize(); i++) {
             body.getStatementList(i).accept(this);
         }
-        return new Type("null");
+        return TypeDefs.voidType;
     }
 
 
@@ -72,26 +96,40 @@ public class TypeChecker implements TypeVisitor {
             block.get(i).accept(this);
         }
         this.scope.exitLocalScope();
-        return new Type("null");
+        return TypeDefs.voidType;
     }
 
 
     public Type visit (VariableDeclaration vardecl) {
         if (this.scope.variableExists(vardecl.id)) {
-            System.out.println("Redefinition of variable.");
+            printError(vardecl.line, vardecl.charPos, "Local variable declaration " + "\"" + vardecl.id + "\"" + " redefines variable in same scope");
+            return vardecl.type;
         }
-        // vardecl.type.accept(this);
-        // vardecl.id.accept(this);
+        this.scope.putLocalVariable(vardecl.id, vardecl.type);
         return vardecl.type;
     }
 
 
     public Type visit (AssignmentStatement astmt) {
+        Type exprType = astmt.expr.accept(this);
         if (!this.scope.variableExists(astmt.id)) {
-            System.out.println("Variable does not exist");
+            printError(astmt.line, astmt.charPos, "Assignment to undeclared variable " + "\"" + astmt.id + "\"");
+            return exprType;
+        }
+        Type astmtType;
+        if (astmt.isArray) {
+            astmtType = astmt.deref.accept(this);
+        } else {
+            astmtType = this.scope.getVariableType(astmt.id);
         }
 
-        return TypeDefs.voidType;
+
+        if (!TypeTables.AssignmentTable.isCompatible(astmtType, exprType)) {
+            exprError(astmt.line, astmt.charPos, astmtType, exprType, "=");
+            return astmtType;
+        }
+
+        return astmtType;
     }
 
 
@@ -123,50 +161,150 @@ public class TypeChecker implements TypeVisitor {
     }
 
     public Type visit (ArrayDereference arrd) {
-        return TypeDefs.voidType;
+        if (!this.scope.variableExists(arrd.id)) {
+            printError(arrd.line, arrd.charPos, "Attempted to dereference array " + "\"" + arrd.id + "\"" + " but it does exist in scope");
+            return TypeDefs.voidType;
+        }
+
+        //todo add global
+        Type etype = arrd.expr.accept(this);
+        if (TypeDefs.integerType != etype) {
+            printError(arrd.line, arrd.charPos, "Attempted to dereference array " + "\"" + arrd.id + "\"" + " incompatible expression type "  + "\"" + etype + "\"");
+        }
+
+        Type arrayType = this.scope.getVariableType(arrd.id);
+        Type primType = new Type(arrayType.primType);
+        return primType;
     }
-    public Type visit (CompareExpression cmpexpr) {
-        return TypeDefs.voidType;
+
+    public Type visit (CompareExpression expr) {
+        Type ltype = expr.left.accept(this);
+        if ( expr.right != null ) {
+            Type rtype = expr.right.accept(this);
+            if (!TypeTables.EqualityTable.isCompatible(ltype, rtype)) {
+                exprError(expr.line, expr.charPos, ltype, rtype, "== ");
+            }
+            return TypeTables.EqualityTable.get(ltype, rtype);
+        }
+        return ltype;
     }
-    public Type visit (ExpressionList exprlist) {
-        return TypeDefs.voidType;
+
+    public ArrayList<Type> visit (ExpressionList exprlist) {
+        ArrayList<Type> types = new ArrayList<Type>();
+        for (int i = 0; i < exprlist.size(); i++) {
+            types.add(exprlist.get(i).accept(this));
+        }
+        return types;
     }
+
     public Type visit (IfElseStatement ifelsestmt) {
         return TypeDefs.voidType;
     }
-    public Type visit (LessThanExpression ltexpr) {
-        return TypeDefs.voidType;
+
+    public Type visit (LessThanExpression expr) {
+        Type ltype = expr.left.accept(this);
+        if ( expr.right != null ) {
+            Type rtype = expr.right.accept(this);
+            if (!TypeTables.LessThanTable.isCompatible(ltype, rtype)) {
+                exprError(expr.line, expr.charPos, ltype, rtype, "<");
+                return ltype;
+            }
+            return TypeTables.LessThanTable.get(ltype, rtype);
+        }
+        return ltype;
     }
-    public Type visit (MultiplicationExpression mexpr) {
-        return TypeDefs.voidType;
+    public Type visit (MultiplicationExpression expr) {
+        Type ltype = expr.left.accept(this);
+        if ( expr.right != null ) {
+            Type rtype = expr.right.accept(this);
+            if (!TypeTables.MultiplicationTable.isCompatible(ltype, rtype)) {
+                exprError(expr.line, expr.charPos, ltype, rtype, "*");
+                return ltype;
+            }
+            return TypeTables.MultiplicationTable.get(ltype, rtype);
+        }
+        return ltype;
     }
-    public Type visit (PlusMinusExpression pmexpr) {
-        return TypeDefs.voidType;
+    public Type visit (PlusMinusExpression expr) {
+        Type ltype = expr.left.accept(this);
+        if ( expr.right != null ) {
+            if ( expr.isAddition ) {
+                Type rtype = expr.right.accept(this);
+                if (!TypeTables.AdditionTable.isCompatible(ltype, rtype)) {
+                    exprError(expr.line, expr.charPos, ltype, rtype, "+");
+                    return ltype;
+                }
+                return TypeTables.AdditionTable.get(ltype, rtype);
+            } else {
+                Type rtype = expr.right.accept(this);
+                if (!TypeTables.SubtractionTable.isCompatible(ltype, rtype)) {
+                    exprError(expr.line, expr.charPos, ltype, rtype, "-");
+                    return ltype;
+                }
+                return TypeTables.SubtractionTable.get(ltype, rtype);
+            }
+        }
+        return ltype;
     }
+
     public Type visit (PrintlnStatement println) {
         return TypeDefs.voidType;
     }
+
     public Type visit (PrintStatement print) {
         return TypeDefs.voidType;
     }
+
     public Type visit (ReturnStatement retstmt) {
         return TypeDefs.voidType;
     }
+
     public Type visit (SimpleStatement stmt) {
+        if (!stmt.isEmpty) {
+            return stmt.expr.accept(this);
+        }
         return TypeDefs.voidType;
     }
+
     public Type visit (PrimitiveType type) {
-        return TypeDefs.voidType;
+        return new Type(type);
     }
+
     public Type visit (VariableDereference varderef) {
-        return TypeDefs.voidType;
+        if (!this.scope.variableExists(varderef.id)) {
+            printError(varderef.line, varderef.charPos, "Attempted to dereference variable " + "\"" + varderef.id + "\"" + " but it does exist in scope");
+            return TypeDefs.voidType;
+        }
+        return this.scope.getVariableType(varderef.id);
     }
     public Type visit (WhileStatement whilestmt) {
+        Type wexpr = whilestmt.expr.accept(this);
+        if (!wexpr.equals(TypeDefs.booleanType)) {
+            printError(whilestmt.line, whilestmt.charPos, "While statement expression is of type \"" + wexpr + "\" expected \"" + TypeDefs.booleanType + "\"");
+        }
+        whilestmt.block.accept(this);
         return TypeDefs.voidType;
     }
 
     public Type visit (FunctionCall funccall) {
-        return TypeDefs.voidType;
+        if (!this.scope.functionExists(funccall.id)) {
+            printError(funccall.line, funccall.charPos, "Function call " + "\"" + funccall.id + "\"" + " is not in scope");
+            return TypeDefs.voidType;
+        }
+        FunctionSignature fs = this.scope.getFunctionSignature(funccall.id);
+        ArrayList<Type> types = funccall.exprs.accept(this);
+        if (fs.paramsSize() != types.size()) {
+            printError(funccall.line, funccall.charPos, "Function call " + "\"" + funccall.id + "\"" + " has " + types.size() + " parameters expected " + fs.paramsSize());
+            return fs.type;
+        }
+        for (int i = 0; i < fs.paramsSize(); i++ ) {
+            Type ptype = fs.getParamType(i);
+            Type ctype = types.get(i);
+            if (! ptype.equals(ctype)) {
+                printError(funccall.line, funccall.charPos, "Function call " + "\"" + funccall.id + "\"" + " parameter " + i + " incompatible type got " + "\"" + ctype + "\" expected " + "\"" + ptype + "\"");
+            }
+        }
+        return fs.type;
     }
 
     public Type visit (Identifier id) {

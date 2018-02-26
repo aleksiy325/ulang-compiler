@@ -1,16 +1,16 @@
 import java.util.HashMap;
 
 public class ScopeFrame {
-    private HashMap<Identifier, Type> functionMap;
+    private HashMap<Identifier, FunctionSignature> functionMap;
     private HashMap<Identifier, Type> varMap;
 
     public ScopeFrame() {
-        functionMap = new HashMap<Identifier, Type>();
+        functionMap = new HashMap<Identifier, FunctionSignature>();
         varMap = new HashMap<Identifier, Type>();
     }
 
-    public void putFunction(Identifier id, Type type) {
-        functionMap.put(id, type);
+    public void putFunction(Identifier id, FunctionSignature fs) {
+        functionMap.put(id, fs);
     }
 
     public void putVariable(Identifier id, Type type) {
@@ -25,7 +25,7 @@ public class ScopeFrame {
         return varMap.containsKey(id);
     }
 
-    public Type getFunctionType(Identifier id) {
+    public FunctionSignature getFunctionSignature(Identifier id) {
         return functionMap.get(id);
     }
 

@@ -59,7 +59,7 @@ pretty:
 
 test: generate accept reject
 
-type: grammar compiler
+type: clean grammar compiler
 	java $(PROG)  $(TYPE)/type_test.ul
 	
 

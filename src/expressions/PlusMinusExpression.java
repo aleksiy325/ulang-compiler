@@ -5,12 +5,16 @@ public class PlusMinusExpression extends Expression {
 
     public PlusMinusExpression (Expression left) {
         this.left = left;
+        this.line = left.line;
+        this.charPos = left.charPos;
     }
 
     public PlusMinusExpression (Expression left, Expression right, String operator) {
         this.left = left;
         this.right = right;
         this.isAddition = operator.equals("+");
+        this.line = left.line;
+        this.charPos = left.charPos;
     }
 
     public void accept (Visitor v) {

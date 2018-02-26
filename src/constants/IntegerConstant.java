@@ -8,6 +8,12 @@ public class IntegerConstant extends Constant {
         this.val = val;
     }
 
+    public IntegerConstant (int val, int line, int charPos) {
+        this.val = val;
+        this.charPos = charPos;
+        this.line = line;
+    }
+
     public void accept (Visitor v) {
         v.visit(this);
     }

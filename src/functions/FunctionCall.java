@@ -5,6 +5,8 @@ public class FunctionCall extends Atom {
     public FunctionCall (Identifier id, ExpressionList exprs) {
         this.id = id;
         this.exprs = exprs;
+        this.line = id.line;
+        this.charPos = this.charPos;
     }
 
     public void accept (Visitor v) {

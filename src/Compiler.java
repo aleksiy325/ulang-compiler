@@ -6,12 +6,14 @@ import java.io.*;
 public class Compiler {
     public static void main (String[] args) throws Exception {
         ANTLRInputStream input;
+        FileInputStream filestream;
 
         if (args.length == 0 ) {
             System.out.println("Usage: Test filename.ul");
             return;
         } else {
-            input = new ANTLRInputStream(new FileInputStream(args[0]));
+            filestream = new FileInputStream(args[0]);
+            input = new ANTLRInputStream(filestream);
         }
 
         // The name of the grammar here is "ulNoActions",
@@ -19,7 +21,9 @@ public class Compiler {
         ulangLexer lexer = new ulangLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ulangParser parser = new ulangParser(tokens);
-        TypeChecker visitor = new TypeChecker();
+        filestream = new FileInputStream(args[0]);
+        InputStreamReader inputstream = new InputStreamReader(filestream);
+        TypeChecker visitor = new TypeChecker(inputstream);
 
         try {
             Program p = parser.program();

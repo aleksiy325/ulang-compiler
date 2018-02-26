@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class ExpressionList extends BaseElement {
+public class ExpressionList {
     ArrayList<Expression> expressionList;
 
     public ExpressionList () {
@@ -23,7 +23,7 @@ public class ExpressionList extends BaseElement {
         v.visit(this);
     }
 
-    public Type accept (TypeVisitor v) {
+    public ArrayList<Type> accept (TypeVisitor v) {
         return v.visit(this);
     }
 }

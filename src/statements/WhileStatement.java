@@ -5,6 +5,8 @@ public class WhileStatement extends Statement {
     public WhileStatement(Expression expr, Block block) {
         this.expr = expr;
         this.block = block;
+        this.line = expr.line;
+        this.charPos = expr.charPos;
     }
 
     public void accept (Visitor v) {

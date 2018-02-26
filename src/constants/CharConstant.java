@@ -2,6 +2,12 @@ public class CharConstant extends Constant {
     char val;
     final Type type = TypeDefs.charType;
 
+    public CharConstant (char val, int line, int charPos) {
+        this.val = val;
+        this.charPos = charPos;
+        this.line = line;
+    }
+
     public CharConstant (char val) {
         this.val = val;
     }

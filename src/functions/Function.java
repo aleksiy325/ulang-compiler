@@ -5,6 +5,8 @@ public class Function extends BaseElement {
     public Function (FunctionDeclaration decl, FunctionBody body) {
         this.decl = decl;
         this.body = body;
+        this.line = decl.line;
+        this.charPos = decl.charPos;
     }
 
     public void accept (Visitor v) {

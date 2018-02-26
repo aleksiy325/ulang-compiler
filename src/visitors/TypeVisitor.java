@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public interface TypeVisitor {
     Type visit (ArrayDereference arrd);
     Type visit (AssignmentStatement astmt);
@@ -5,10 +7,10 @@ public interface TypeVisitor {
     Type visit (BooleanConstant bool);
     Type visit (CharConstant character);
     Type visit (CompareExpression cmpexpr);
-    Type visit (ExpressionList exprlist);
+    ArrayList<Type> visit (ExpressionList exprlist);
     Type visit (FloatConstant cfloat);
     Type visit (FormalParameter param);
-    Type visit (FormalParameterList params);
+    ArrayList<Type>  visit (FormalParameterList params);
     Type visit (Function func);
     Type visit (FunctionBody body);
     Type visit (FunctionCall funccall);

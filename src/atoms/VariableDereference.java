@@ -3,6 +3,8 @@ public class VariableDereference extends Atom {
 
     public VariableDereference (Identifier id) {
         this.id = id;
+        this.line = id.line;
+        this.charPos = id.charPos;
     }
 
     public void accept (Visitor v) {
