@@ -6,6 +6,7 @@ public class TypeChecker implements TypeVisitor {
     Scope scope;
     ArrayList<String> lines;
     Identifier main = new Identifier("main");
+    FunctionSignature current;
 
     public TypeChecker(InputStreamReader input) throws IOException {
         lines = new ArrayList<String>();
@@ -33,6 +34,7 @@ public class TypeChecker implements TypeVisitor {
     public void exprError(int line, int charPos, Type ltype, Type rtype, String operator) {
         printError(line, charPos, "Incompatible types " + "\"" + ltype  + "\"" + " and " + "\"" + rtype + "\"" + " for operator " + operator);
     }
+
 
     public Type visit (Program prog) {
         this.scope.enterLocalScope();
@@ -78,6 +80,7 @@ public class TypeChecker implements TypeVisitor {
         }
         ArrayList<Type> types = fdecl.params.accept(this);
         FunctionSignature fs = new FunctionSignature(fdecl.type, types, fdecl.id);
+        this.current = fs;
         this.scope.putGlobalFunction(fdecl.id, fs);
         return fdecl.type.accept(this);
     }
@@ -307,7 +310,11 @@ public class TypeChecker implements TypeVisitor {
     }
 
     public Type visit (ReturnStatement retstmt) {
-        return TypeDefs.voidType;
+        Type type = retstmt.expr.accept(this);
+        if (!this.current.type.equals(type)) {
+            printError(retstmt.line, retstmt.charPos, "Incompatible return type "  + "\"" + type + "\"" + " expected " + "\"" + this.current.type + "\"" );
+        }
+        return type;
     }
 
     public Type visit (SimpleStatement stmt) {
