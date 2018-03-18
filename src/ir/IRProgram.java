@@ -12,6 +12,7 @@ public class IRProgram {
     }
 
     void print() {
+        System.out.print("PROG simple");
         for (IRFunction func : functions) {
             func.print();
         }

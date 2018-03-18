@@ -18,20 +18,33 @@ public class IRScope {
         cur = 0;
     }
 
-    public int putVariable(Identifier id) {
+    public IRTemp newTemp(Identifier id, String type) {
         int var = cur;
         varMap.put(id, var);
         cur++;
-        return var;
+        IRTemp t = new IRTemp(var, type);
+        temps.add(t);
+        return t;
+    }
+
+    public IRTemp newTemp(String type) {
+        int var = cur;
+        cur++;
+        IRTemp t = new IRTemp(var, type);
+        temps.add(t);
+        return t;
     }
 
     public boolean containsVariable(Identifier id) {
         return varMap.containsKey(id);
     }
 
+    public IRTemp getVariableSymbol(Identifier id) {
+        return temps.get(varMap.get(id));
+    }
 
-    public int getVariableSymbol(Identifier id) {
-        return varMap.get(id);
+    public ArrayList<IRTemp> getTemps() {
+        return this.temps;
     }
 
 }

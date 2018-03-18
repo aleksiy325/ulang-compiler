@@ -41,7 +41,7 @@ public class Identifier extends BaseElement implements Comparable<Identifier> {
         return v.visit(this);
     }
 
-    public int accept (IRVisitor v) {
+    public IRTemp accept (IRVisitor v) {
         return v.visit(this);
     }
 

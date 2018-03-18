@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class IRGenerator implements IRVisitor {
     HashMap<PrimitiveType, String> typeMap;
     IRScope scope;
+    ArrayList<String> lines;
 
     public IRGenerator() {
         scope = new IRScope();
@@ -14,6 +15,9 @@ public class IRGenerator implements IRVisitor {
         typeMap.put(TypeDefs.stringPrimitive, "U");
         typeMap.put(TypeDefs.booleanPrimitive, "Z");
         typeMap.put(TypeDefs.voidPrimitive, "V");
+
+        this.lines = new ArrayList<String>();
+
     }
 
     public IRProgram visit (Program prog) {
@@ -47,19 +51,12 @@ public class IRGenerator implements IRVisitor {
     }
 
     public IRTemp visit (FormalParameter param) {
-        int id = param.id.accept(this);
         String type = param.type.accept(this);
-        return new IRTemp(id, type);
+        return this.scope.newTemp(param.id, type);
     }
 
-    public int visit (Identifier id) {
-        int symbol;
-        if (this.scope.containsVariable(id)) {
-            symbol = this.scope.getVariableSymbol(id);
-        } else {
-            symbol = this.scope.putVariable(id);
-        }
-        return symbol;
+    public IRTemp visit (Identifier id) {
+        return this.scope.getVariableSymbol(id);
     }
 
     public String visit (Type type) {
@@ -76,62 +73,141 @@ public class IRGenerator implements IRVisitor {
 
     public IRBody visit (FunctionBody body) {
         IRBody irb = new IRBody();
-
         for (int i = 0; i < body.varDeclSize(); i++) {
-            irb.addTemp(body.getVarDecl(i).accept(this));
+            body.getVarDecl(i).accept(this);
         }
         for (int i = 0; i < body.statementSize(); i++) {
-            irb.addStatement(body.getStatementList(i).accept(this));
+            body.getStatementList(i).accept(this);
         }
+        irb.addTemps(this.scope.getTemps());
+        irb.addLines(this.lines);
+        this.lines = new ArrayList<String>();
+
 
         return irb;
     }
 
     public IRTemp visit (VariableDeclaration vdecl) {
         String t = vdecl.type.accept(this);
-        int id = vdecl.id.accept(this);
-        return new IRTemp(id, t);
+        return this.scope.newTemp(vdecl.id, t);
     }
 
-    public String visit (BooleanConstant bool) {
+    public IRTemp visit (BooleanConstant bool) {
+        IRTemp temp = this.scope.newTemp("Z");
         if (bool.val) {
-            return "TRUE";
+            this.lines.add(temp.toString() + " := " + "TRUE" + ";");
+        } else {
+            this.lines.add(temp.toString() + " := " + "FALSE" + ";");
         }
-        return "FALSE";
+        return temp;
     }
 
-    public String visit (CharConstant character) {
-        return String.valueOf(character.val);
+    public IRTemp visit (CharConstant character) {
+        IRTemp temp = this.scope.newTemp("C");
+        this.lines.add(temp.toString() + " := " + String.valueOf(character.val) + ";");
+        return temp;
     }
 
-    public String visit (FloatConstant cfloat) {
-        return String.valueOf(cfloat.val);
+    public IRTemp visit (FloatConstant cfloat) {
+        IRTemp temp = this.scope.newTemp("F");
+        this.lines.add(temp.toString() + " := " + String.valueOf(cfloat.val) + ";");
+        return temp;
     }
 
-    public String visit (IntegerConstant cint) {
-        return String.valueOf(cint.val);
+    public IRTemp visit (IntegerConstant cint) {
+        IRTemp temp = this.scope.newTemp("I");
+        this.lines.add(temp.toString() + " := " + String.valueOf(cint.val) + ";");
+        return temp;
     }
 
-    public String visit (StringConstant cstring) {
-        //TODO: fix
-        return cstring.val;
+    public IRTemp visit (StringConstant cstring) {
+        IRTemp temp = this.scope.newTemp("U");
+        this.lines.add(temp.toString() + " := " + cstring.val + ";");
+        return temp;
     }
 
-    public String visit (SimpleStatement stmt) {
+    public IRTemp visit (Statement stmt) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (SimpleStatement stmt) {
         if (!stmt.isEmpty) {
             return stmt.expr.accept(this);
         }
-        return "";
+        return new IRTemp();
     }
 
-    public String visit (AssignmentStatement astmt) {
-        int id = astmt.id.accept(this);
-        String expr = astmt.expr.accept(this);
-        return String.valueOf(id) + " := " + expr;
+    public IRTemp visit (AssignmentStatement astmt) {
+        IRTemp n = astmt.id.accept(this);
+        IRTemp t = astmt.expr.accept(this);
+        //String.valueOf(id) + " := " + expr + ";";
+        return n;
     }
 
-    public int visit (MultiplicationExpression mexpr) {
-        return 0;
+    public IRTemp visit (IfElseStatement stmt) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (PrintStatement stmt) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (PrintlnStatement stmt) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (WhileStatement stmt) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (CompareExpression expr) {
+        IRTemp left = expr.left.accept(this);
+        if ( expr.right != null ) {
+            IRTemp right = expr.right.accept(this);
+            this.lines.add(left.toString() + " := " + left.toString() + " " + left.type + "== " + right.toString() + ";");
+        }
+        return left;
+    }
+
+    public IRTemp visit (LessThanExpression expr) {
+        IRTemp left = expr.left.accept(this);
+        if ( expr.right != null ) {
+            IRTemp right = expr.right.accept(this);
+        }
+        return left;
+    }
+
+    public IRTemp    visit (MultiplicationExpression expr) {
+        IRTemp left = expr.left.accept(this);
+        if ( expr.right != null ) {
+            IRTemp right = expr.right.accept(this);
+        }
+        return left;
+    }
+
+    public IRTemp visit (PlusMinusExpression expr) {
+        IRTemp left = expr.left.accept(this);
+        if ( expr.right != null ) {
+            IRTemp right = expr.right.accept(this);
+        }
+        return left;
+    }
+
+    public IRTemp visit (Expression expr) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (ArrayDereference deref) {
+        return new IRTemp();
+    }
+
+    public IRTemp visit (VariableDereference deref) {
+        return new IRTemp();
+    }
+
+
+    public IRTemp visit (FunctionCall call) {
+        return new IRTemp();
     }
 
 }

@@ -11,6 +11,10 @@ public class IRTemp {
         this.type = type;
     }
 
+    public String toString() {
+        return "T" + String.valueOf(this.id);
+    }
+
     public void printDecl() {
         System.out.println("TEMP " + id + ":" + type + ";");
     }

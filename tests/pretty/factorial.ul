@@ -3,6 +3,7 @@ int factorial(int n)
 	int a;
 	float b;
 	boolean c;
+	c = false == false == false;
 }
 
 void main()

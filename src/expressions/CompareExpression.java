@@ -22,4 +22,8 @@ public class CompareExpression extends Expression {
     public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
+
+    public IRTemp accept (IRVisitor v) {
+        return v.visit(this);
+    }
 }

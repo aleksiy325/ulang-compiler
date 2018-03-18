@@ -27,7 +27,7 @@ compiler:
 	javac -d $(BIN) $(BIN)/*.java
 	javac -d $(BIN) $(SRC)/*.java
 
-run: grammar compiler
+run: clean grammar compiler
 	java $(PROG)  $(PRETTY)/factorial.ul
 
 clean:

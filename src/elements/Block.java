@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Block extends BaseElement {
+public class Block extends Element {
     ArrayList<Statement> statementList;
 
     public Block () {

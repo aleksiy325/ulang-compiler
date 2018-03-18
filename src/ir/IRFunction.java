@@ -26,10 +26,10 @@ public class IRFunction {
         for (IRTemp param : params) {
             System.out.print(param.type);
         }
-        System.out.print(")" + rtype);
-        for (IRTemp param : params) {
-            param.printDecl();
-        }
+        System.out.println(")" + rtype);
+        System.out.println("{");
         body.print();
+        System.out.println("}");
+
     }
 }

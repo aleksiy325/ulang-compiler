@@ -29,7 +29,7 @@ public class AssignmentStatement extends Statement {
         return v.visit(this);
     }
 
-    public String accept (IRVisitor v) {
+    public IRTemp accept (IRVisitor v) {
         return v.visit(this);
     }
 }

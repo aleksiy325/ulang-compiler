@@ -2,24 +2,26 @@ import java.util.ArrayList;
 
 public class IRBody {
     ArrayList<IRTemp> temps;
-    ArrayList<String> statements;
+    ArrayList<String> lines;
 
     public IRBody () {
-        temps = new ArrayList<IRTemp>();
-        statements = new ArrayList<String>();
+
     }
 
-    public void addTemp(IRTemp temp) {
-        temps.add(temp);
+    public void addTemps(ArrayList<IRTemp> temps) {
+        this.temps = temps;
     }
 
-    public void addStatement(String stmt) {
-        statements.add(stmt);
+    public void addLines(ArrayList<String> lines) {
+        this.lines = lines;
     }
 
     public void print() {
         for (IRTemp temp : temps) {
             temp.printDecl();
+        }
+        for (String line : lines) {
+            System.out.println(line);
         }
     }
 }
