@@ -26,4 +26,8 @@ public class ExpressionList {
     public ArrayList<Type> accept (TypeVisitor v) {
         return v.visit(this);
     }
+
+    public ArrayList<IRTemp> accept (IRVisitor v) {
+        return v.visit(this);
+    }
 }

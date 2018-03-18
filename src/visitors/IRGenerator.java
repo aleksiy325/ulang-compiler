@@ -4,10 +4,13 @@ import java.util.ArrayList;
 public class IRGenerator implements IRVisitor {
     HashMap<PrimitiveType, String> typeMap;
     IRScope scope;
+    Scope funcScope;
     ArrayList<String> lines;
+    String curFuncRetType = "V";
 
     public IRGenerator() {
         scope = new IRScope();
+        funcScope = new Scope();
         typeMap = new HashMap<PrimitiveType, String>();
         typeMap.put(TypeDefs.integerPrimitive, "I");
         typeMap.put(TypeDefs.floatPrimitive, "F");
@@ -38,6 +41,7 @@ public class IRGenerator implements IRVisitor {
     public IRFunction visit (FunctionDeclaration fdecl) {
         String irftype = fdecl.type.accept(this);
         ArrayList<IRTemp> irparams = fdecl.params.accept(this);
+        this.funcScope.putGlobalFunction(fdecl.id, new FunctionSignature(fdecl.type));
         return new IRFunction(fdecl.id, irparams, irftype);
     }
 
@@ -48,6 +52,14 @@ public class IRGenerator implements IRVisitor {
             irparams.add(params.get(i).accept(this));
         }
         return irparams;
+    }
+
+    public ArrayList<IRTemp> visit (ExpressionList exprs) {
+        ArrayList<IRTemp> temps = new ArrayList<IRTemp>();
+        for (int i = 0; i < exprs.size(); i++) {
+            temps.add(exprs.get(i).accept(this));
+        }
+        return temps;
     }
 
     public IRTemp visit (FormalParameter param) {
@@ -140,23 +152,50 @@ public class IRGenerator implements IRVisitor {
     public IRTemp visit (AssignmentStatement astmt) {
         IRTemp n = astmt.id.accept(this);
         IRTemp t = astmt.expr.accept(this);
-        //String.valueOf(id) + " := " + expr + ";";
+        this.lines.add(n + " := " + t + ";");
         return n;
     }
 
     public IRTemp visit (IfElseStatement stmt) {
+        IRLabel clbl = this.scope.newLabel();
+        IRTemp cond = stmt.expr.accept(this);
+        this.lines.add(cond + " := " + cond.type + "! " + cond  + ";");
+        this.lines.add("IF " + cond + " GOTO " + clbl + ";");
+        stmt.ifblock.accept(this);
+        if (stmt.hasElse) {
+            IRLabel elbl = this.scope.newLabel();
+            this.lines.add("GOTO " + elbl + ";");
+            this.lines.add(clbl + ":;");
+            stmt.elseblock.accept(this);
+            this.lines.add(elbl + ":;");
+        } else {
+            this.lines.add(clbl + ":;");
+        }
         return new IRTemp();
     }
 
     public IRTemp visit (PrintStatement stmt) {
-        return new IRTemp();
+        IRTemp t = stmt.expr.accept(this);
+        this.lines.add("PRINT" + t.type + " " + t + ";");
+        return t;
     }
 
     public IRTemp visit (PrintlnStatement stmt) {
-        return new IRTemp();
+        IRTemp t = stmt.expr.accept(this);
+        this.lines.add("PRINTLN" + t.type + " " + t + ";");
+        return t;
     }
 
     public IRTemp visit (WhileStatement stmt) {
+        IRLabel enter = this.scope.newLabel();
+        IRLabel exit = this.scope.newLabel();
+        this.lines.add(enter + ":;");
+        IRTemp cond = stmt.expr.accept(this);
+        this.lines.add(cond + " := " + cond.type + "! " + cond  + ";");
+        this.lines.add("IF " + cond + " GOTO " + exit + ";");
+        stmt.block.accept(this);
+        this.lines.add("GOTO " + enter + ";");
+        this.lines.add(exit  + ":;");
         return new IRTemp();
     }
 
@@ -164,7 +203,9 @@ public class IRGenerator implements IRVisitor {
         IRTemp left = expr.left.accept(this);
         if ( expr.right != null ) {
             IRTemp right = expr.right.accept(this);
-            this.lines.add(left.toString() + " := " + left.toString() + " " + left.type + "== " + right.toString() + ";");
+            IRTemp ret = this.scope.newTemp("Z");
+            this.lines.add(ret + " := " + left + " " + left.type + "== " + right + ";");
+            return ret;
         }
         return left;
     }
@@ -173,14 +214,18 @@ public class IRGenerator implements IRVisitor {
         IRTemp left = expr.left.accept(this);
         if ( expr.right != null ) {
             IRTemp right = expr.right.accept(this);
+            IRTemp ret = this.scope.newTemp("Z");
+            this.lines.add(ret + " := " + left + " " + left.type + "< " + right + ";");
+            return ret;
         }
         return left;
     }
 
-    public IRTemp    visit (MultiplicationExpression expr) {
+    public IRTemp visit (MultiplicationExpression expr) {
         IRTemp left = expr.left.accept(this);
         if ( expr.right != null ) {
             IRTemp right = expr.right.accept(this);
+            this.lines.add(left.toString() + " := " + left + " " + left.type + "* " + right + ";");
         }
         return left;
     }
@@ -189,6 +234,11 @@ public class IRGenerator implements IRVisitor {
         IRTemp left = expr.left.accept(this);
         if ( expr.right != null ) {
             IRTemp right = expr.right.accept(this);
+            String sign = "-";
+            if (expr.isAddition) {
+                sign = "+";
+            }
+            this.lines.add(left.toString() + " := " + left + " " + left.type + sign + " " + right + ";");
         }
         return left;
     }
@@ -202,11 +252,41 @@ public class IRGenerator implements IRVisitor {
     }
 
     public IRTemp visit (VariableDereference deref) {
+        return deref.id.accept(this);
+    }
+
+    public IRTemp visit (FunctionCall call) {
+        IRTemp ret = new IRTemp();
+        String line = "CALL " + call.id.val + "(";
+        Type retType = this.funcScope.getFunctionSignature(call.id).type;
+        if (!retType.equals(TypeDefs.voidType)) {
+            ret = this.scope.newTemp(retType.accept(this));
+            line = ret + " := " + line;
+        }
+        ArrayList<IRTemp> args = call.exprs.accept(this);
+        for (IRTemp arg : args) {
+            line += arg;
+        }
+        this.lines.add(line + ");");
+        return ret;
+    }
+
+    public IRTemp visit (Block block) {
+        for (int i = 0; i < block.size(); i++) {
+            block.get(i).accept(this);
+        }
         return new IRTemp();
     }
 
-
-    public IRTemp visit (FunctionCall call) {
+    public IRTemp visit (ReturnStatement ret) {
+        String line = "RETURN";
+        if (!ret.isEmpty) {
+            IRTemp t = ret.expr.accept(this);
+            line += " " + t + ";";
+            this.lines.add(line);
+            return t;
+        }
+        this.lines.add(line + ";");
         return new IRTemp();
     }
 

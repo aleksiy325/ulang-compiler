@@ -4,6 +4,7 @@ public interface IRVisitor {
     IRProgram visit (Program prog);
     IRFunction visit (Function func);
     ArrayList<IRTemp> visit (FormalParameterList params);
+    ArrayList<IRTemp> visit (ExpressionList params);
     IRTemp visit (FormalParameter param);
     IRFunction visit (FunctionDeclaration funcdecl);
     IRTemp visit (Identifier id);
@@ -17,6 +18,7 @@ public interface IRVisitor {
     IRTemp visit (PrintStatement stmt);
     IRTemp visit (PrintlnStatement stmt);
     IRTemp visit (WhileStatement stmt);
+    IRTemp visit (ReturnStatement ret);
     IRTemp visit (BooleanConstant bool);
     IRTemp visit (CharConstant character);
     IRTemp visit (FloatConstant cfloat);
@@ -31,4 +33,5 @@ public interface IRVisitor {
     IRTemp visit (VariableDereference varderef);
     IRTemp visit (ArrayDereference deref);
     IRTemp visit (FunctionCall call);
+    IRTemp visit (Block block);
 }

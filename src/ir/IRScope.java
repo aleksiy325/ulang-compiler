@@ -4,32 +4,35 @@ import java.util.ArrayList;
 public class IRScope {
     private HashMap<Identifier, Integer> varMap;
     private ArrayList<IRTemp> temps;
-    int cur;
+    int curTemps;
+    int curLabel;
 
     public IRScope() {
         this.varMap = new HashMap<Identifier, Integer>();
         this.temps = new ArrayList<IRTemp>();
-        cur = 0;
+        curTemps = 0;
+        curLabel = 0;
     }
 
     public void reset() {
         this.varMap = new HashMap<Identifier, Integer>();
         this.temps = new ArrayList<IRTemp>();
-        cur = 0;
+        curTemps = 0;
+        curLabel = 0;
     }
 
     public IRTemp newTemp(Identifier id, String type) {
-        int var = cur;
+        int var = curTemps;
         varMap.put(id, var);
-        cur++;
+        curTemps++;
         IRTemp t = new IRTemp(var, type);
         temps.add(t);
         return t;
     }
 
     public IRTemp newTemp(String type) {
-        int var = cur;
-        cur++;
+        int var = curTemps;
+        curTemps++;
         IRTemp t = new IRTemp(var, type);
         temps.add(t);
         return t;
@@ -47,4 +50,9 @@ public class IRScope {
         return this.temps;
     }
 
+    public IRLabel newLabel() {
+        int var = curLabel;
+        curLabel++;
+        return new IRLabel(var);
+    }
 }

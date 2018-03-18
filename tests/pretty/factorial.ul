@@ -1,14 +1,16 @@
 int factorial(int n)
 {
-	int a;
-	float b;
-	boolean c;
-	c = false == false == false;
-}
-
+	if (n == 1)
+	{
+		return 1;
+	}
+	else
+	{
+		return (n*factorial(n-1));
+ 	}
+ }
 void main()
-{	
-	int a;
-	int b;
-	factorial(10);	
+{
+ 	print "The ... of 8 is ";
+	print factorial(8);
 }
