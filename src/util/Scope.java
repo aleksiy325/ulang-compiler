@@ -29,6 +29,12 @@ public class Scope {
         local.peek().putFunction(id, fs);
     }
 
+    public void putLocalFunctionAbove(Identifier id, FunctionSignature fs) {
+        ScopeFrame cur = local.pop();
+        local.peek().putFunction(id, fs);
+        local.push(cur);
+    }
+
     public void putLocalVariable(Identifier id, Type type) {
         local.peek().putVariable(id, type);
     }

@@ -1,0 +1,13 @@
+int factorial(int n)
+{
+	int a;
+	float b;
+	boolean c;
+}
+
+void main()
+{	
+	int a;
+	int b;
+	factorial(10);	
+}

@@ -23,11 +23,15 @@ public class Compiler {
         ulangParser parser = new ulangParser(tokens);
         filestream = new FileInputStream(args[0]);
         InputStreamReader inputstream = new InputStreamReader(filestream);
-        TypeChecker visitor = new TypeChecker(inputstream);
+        TypeChecker typeVisitor = new TypeChecker(inputstream);
+        IRGenerator irgen = new IRGenerator();
+
 
         try {
             Program p = parser.program();
-            p.accept(visitor);
+            p.accept(typeVisitor);
+            IRProgram ir = p.accept(irgen);
+            ir.print();
         } catch (RecognitionException e )   {
             // A lexical or parsing error occured.
             // ANTLR will have already printed information on the

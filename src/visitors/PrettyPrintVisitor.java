@@ -56,9 +56,7 @@ public class PrettyPrintVisitor implements Visitor {
         astmt.id.accept(this);
         System.out.print(EQUALS);
         if ( astmt.isArray ) {
-            System.out.print(LSQR);
-            astmt.size.accept(this);
-            System.out.print(RSQR);
+            astmt.deref.accept(this);
         }
         astmt.expr.accept(this);
         System.out.print(SEMICOLON);
@@ -98,7 +96,7 @@ public class PrettyPrintVisitor implements Visitor {
     }
 
     public void visit (Type ctype) {
-        ctype.type.accept(this);
+        ctype.primType.accept(this);
         if ( ctype.isArray ) {
             System.out.print(LSQR);
             ctype.size.accept(this);
@@ -264,8 +262,8 @@ public class PrettyPrintVisitor implements Visitor {
         System.out.print(cstring.val);
     }
 
-    public void visit (Type type) {
-        System.out.print(type.val);
+    public void visit (PrimitiveType type) {
+        System.out.print(type.id);
     }
 
     public void visit (VariableDeclaration vardecl) {
@@ -285,5 +283,4 @@ public class PrettyPrintVisitor implements Visitor {
         System.out.print(RBRACK + NL);
         whilestmt.block.accept(this);
     }
-
 }

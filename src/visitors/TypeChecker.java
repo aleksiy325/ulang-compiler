@@ -41,7 +41,6 @@ public class TypeChecker implements TypeVisitor {
         for (int i = 0; i < prog.size(); i++) {
             prog.get(i).accept(this);
         }
-        this.scope.exitLocalScope();
         FunctionSignature fs = new FunctionSignature(TypeDefs.voidType);
 
         if (!this.scope.functionExists(this.main)) {
@@ -60,7 +59,7 @@ public class TypeChecker implements TypeVisitor {
             printError(candidate.line, candidate.charPos, "Main function has " + candidate.paramsSize() + " parameters expected " + fs.paramsSize());
             return TypeDefs.voidType;
         }
-
+        this.scope.exitLocalScope();
         return TypeDefs.voidType;
     }
 
@@ -81,7 +80,7 @@ public class TypeChecker implements TypeVisitor {
         ArrayList<Type> types = fdecl.params.accept(this);
         FunctionSignature fs = new FunctionSignature(fdecl.type, types, fdecl.id);
         this.current = fs;
-        this.scope.putGlobalFunction(fdecl.id, fs);
+        this.scope.putLocalFunctionAbove(fdecl.id, fs);
         return fdecl.type.accept(this);
     }
 

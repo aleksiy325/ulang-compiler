@@ -32,4 +32,5 @@ public class ScopeFrame {
     public Type getVariableType(Identifier id) {
         return varMap.get(id);
     }
+
 }

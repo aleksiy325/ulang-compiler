@@ -40,4 +40,9 @@ public class FunctionBody extends BaseElement {
     public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
+
+    IRBody accept(IRVisitor v) {
+        return v.visit(this);
+    }
+
 }

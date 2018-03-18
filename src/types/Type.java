@@ -60,6 +60,10 @@ public class Type extends BaseElement implements Comparable<Type>  {
         return v.visit(this);
     }
 
+    public String accept (IRVisitor v) {
+        return v.visit(this);
+    }
+
     public String toString() {
         String str = primType.toString();
         if (isArray) {

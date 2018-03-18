@@ -27,8 +27,8 @@ compiler:
 	javac -d $(BIN) $(BIN)/*.java
 	javac -d $(BIN) $(SRC)/*.java
 
-run:
-	java $(PROG)  $(PRETTY)/sample.ul
+run: grammar compiler
+	java $(PROG)  $(PRETTY)/factorial.ul
 
 clean:
 	rm -rf $(BIN)

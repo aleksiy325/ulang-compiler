@@ -18,4 +18,8 @@ public class FunctionDeclaration extends BaseElement {
     public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
+
+    public IRFunction accept (IRVisitor v) {
+        return v.visit(this);
+    }
 }

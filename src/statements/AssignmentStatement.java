@@ -28,4 +28,8 @@ public class AssignmentStatement extends Statement {
     public Type accept (TypeVisitor v) {
         return v.visit(this);
     }
+
+    public String accept (IRVisitor v) {
+        return v.visit(this);
+    }
 }

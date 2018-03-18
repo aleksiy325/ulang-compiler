@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Program extends BaseElement {
+public class Program {
     ArrayList<Function> statementList;
 
     public Program () {
@@ -24,6 +24,10 @@ public class Program extends BaseElement {
     }
 
     public Type accept (TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    public IRProgram accept (IRVisitor v) {
         return v.visit(this);
     }
 }
