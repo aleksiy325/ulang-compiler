@@ -7,8 +7,10 @@ public class IRGenerator implements IRVisitor {
     Scope funcScope;
     ArrayList<String> lines;
     String curFuncRetType = "V";
+    String name;
 
-    public IRGenerator() {
+    public IRGenerator(String name) {
+        this.name = name;
         scope = new IRScope();
         funcScope = new Scope();
         typeMap = new HashMap<PrimitiveType, String>();
@@ -24,7 +26,7 @@ public class IRGenerator implements IRVisitor {
     }
 
     public IRProgram visit (Program prog) {
-        IRProgram program = new IRProgram();
+        IRProgram program = new IRProgram(this.name);
         for (int i = 0; i < prog.size(); i++) {
             program.addFunction(prog.get(i).accept(this));
         }
@@ -101,7 +103,13 @@ public class IRGenerator implements IRVisitor {
 
     public IRTemp visit (VariableDeclaration vdecl) {
         String t = vdecl.type.accept(this);
-        return this.scope.newTemp(vdecl.id, t);
+        IRTemp temp = this.scope.newTemp(vdecl.id, t);
+        if (vdecl.type.isArray) {
+            String size = String.valueOf(vdecl.type.size.val);
+            String arrType = temp.getArrayType();
+            this.lines.add(temp + " := NEWARRAY " + arrType + size + ";");
+        }
+        return temp;
     }
 
     public IRTemp visit (BooleanConstant bool) {
@@ -116,7 +124,7 @@ public class IRGenerator implements IRVisitor {
 
     public IRTemp visit (CharConstant character) {
         IRTemp temp = this.scope.newTemp("C");
-        this.lines.add(temp.toString() + " := " + String.valueOf(character.val) + ";");
+        this.lines.add(temp.toString() + " := " + "'" + String.valueOf(character.val) + "'" + ";");
         return temp;
     }
 
@@ -152,7 +160,12 @@ public class IRGenerator implements IRVisitor {
     public IRTemp visit (AssignmentStatement astmt) {
         IRTemp n = astmt.id.accept(this);
         IRTemp t = astmt.expr.accept(this);
-        this.lines.add(n + " := " + t + ";");
+        if (astmt.isArray) {
+            IRTemp deref = astmt.deref.expr.accept(this);
+            this.lines.add(n + "[" + deref + "]" + " := " + t + ";");
+        } else {
+            this.lines.add(n + " := " + t + ";");
+        }
         return n;
     }
 
@@ -225,7 +238,9 @@ public class IRGenerator implements IRVisitor {
         IRTemp left = expr.left.accept(this);
         if ( expr.right != null ) {
             IRTemp right = expr.right.accept(this);
-            this.lines.add(left.toString() + " := " + left + " " + left.type + "* " + right + ";");
+            IRTemp ret = this.scope.newTemp(right.type);
+            this.lines.add(ret + " := " + left + " " + left.type + "* " + right + ";");
+            return ret;
         }
         return left;
     }
@@ -238,7 +253,9 @@ public class IRGenerator implements IRVisitor {
             if (expr.isAddition) {
                 sign = "+";
             }
-            this.lines.add(left.toString() + " := " + left + " " + left.type + sign + " " + right + ";");
+            IRTemp ret = this.scope.newTemp(right.type);
+            this.lines.add(ret + " := " + left + " " + left.type + sign + " " + right + ";");
+            return ret;
         }
         return left;
     }
@@ -248,7 +265,12 @@ public class IRGenerator implements IRVisitor {
     }
 
     public IRTemp visit (ArrayDereference deref) {
-        return new IRTemp();
+        IRTemp array = this.scope.getVariableSymbol(deref.id);
+        IRTemp expr = deref.expr.accept(this);
+        String arrType = array.getArrayType();
+        IRTemp temp = this.scope.newTemp(arrType);
+        this.lines.add(temp + " := " + array + "[" + expr + "];");
+        return temp;
     }
 
     public IRTemp visit (VariableDereference deref) {

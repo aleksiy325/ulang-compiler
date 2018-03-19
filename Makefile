@@ -28,7 +28,11 @@ compiler:
 	javac -d $(BIN) $(SRC)/*.java
 
 run: clean grammar compiler
-	java $(PROG)  $(PRETTY)/factorial.ul
+	java $(PROG)  $(PRETTY)/factorial.ul > ./bin/factorial.ir 
+	codegen/codegen --file=./bin/factorial.ir > ./bin/factorial.j
+	java jasmin.Main bin/factorial.j
+	mv factorial.class bin/factorial.class
+	java factorial
 
 clean:
 	rm -rf $(BIN)

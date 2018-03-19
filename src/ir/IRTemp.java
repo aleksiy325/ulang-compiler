@@ -11,6 +11,10 @@ public class IRTemp {
         this.type = type;
     }
 
+    public String getArrayType() {
+        return String.valueOf(this.type.charAt(this.type.length() - 1));
+    }
+
     public String toString() {
         return "T" + String.valueOf(this.id);
     }

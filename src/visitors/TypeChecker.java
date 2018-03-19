@@ -200,7 +200,7 @@ public class TypeChecker implements TypeVisitor {
 
         //todo add global
         Type etype = arrd.expr.accept(this);
-        if (TypeDefs.integerType != etype) {
+        if (!TypeDefs.integerType.equals(etype)) {
             printError(arrd.line, arrd.charPos, "Attempted to dereference array " + "\"" + arrd.id + "\"" + " incompatible expression type "  + "\"" + etype + "\"");
             return TypeDefs.voidType;
         }
@@ -309,7 +309,12 @@ public class TypeChecker implements TypeVisitor {
     }
 
     public Type visit (ReturnStatement retstmt) {
-        Type type = retstmt.expr.accept(this);
+
+        Type type = TypeDefs.voidType;
+        if (!retstmt.isEmpty) {
+            type = retstmt.expr.accept(this);
+        }
+
         if (!this.current.type.equals(type)) {
             printError(retstmt.line, retstmt.charPos, "Incompatible return type "  + "\"" + type + "\"" + " expected " + "\"" + this.current.type + "\"" );
         }

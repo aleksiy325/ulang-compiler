@@ -23,5 +23,8 @@ public class IRBody {
         for (String line : lines) {
             System.out.println(line);
         }
+        if (!lines.get(lines.size() - 1 ).startsWith("RETURN")) { // MAke sure all funcs have return hack
+            System.out.println("RETURN;");
+        }
     }
 }

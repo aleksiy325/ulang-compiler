@@ -24,8 +24,10 @@ public class Compiler {
         filestream = new FileInputStream(args[0]);
         InputStreamReader inputstream = new InputStreamReader(filestream);
         TypeChecker typeVisitor = new TypeChecker(inputstream);
-        IRGenerator irgen = new IRGenerator();
-
+        String[] fnameTokens = args[0].split("/");
+        String filename = fnameTokens[fnameTokens.length - 1];
+        filename = filename.substring(0, filename.length() - 3);
+        IRGenerator irgen = new IRGenerator(filename);
 
         try {
             Program p = parser.program();
