@@ -9,3 +9,4 @@ Add `./bin:./src:./src/expressions:./src/functions:./src/statements:./src/types:
 `make type` to run my tests
 
 ### Generating IR
+Compile and then run `Compiler` located in the `bin` directory.
