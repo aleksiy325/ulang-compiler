@@ -17,7 +17,8 @@ RED=\033[0;31m
 END=\e[0m
 
 
-all: grammar compiler
+
+all: grammar compiler 
 
 grammar: $(GSRCS)
 	java org.antlr.Tool -fo $(BIN) $(SRC)/$(GSRC)
