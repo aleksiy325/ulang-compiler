@@ -1,0 +1,26 @@
+PROG constants
+FUNC main ()V
+{
+TEMP 0:I;
+TEMP 1:F;
+TEMP 2:Z;
+TEMP 3:U;
+TEMP 4:C;
+TEMP 5:I;
+TEMP 6:F;
+TEMP 7:Z;
+TEMP 8:U;
+TEMP 9:C;
+T5 := 5;
+T0 := T5;
+T6 := 5.23;
+T1 := T6;
+T7 := FALSE;
+T2 := T7;
+T8 := "test";
+T3 := T8;
+T9 := 'c';
+T4 := T9;
+RETURN;
+}
+

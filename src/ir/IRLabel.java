@@ -8,4 +8,8 @@ public class IRLabel {
     public String toString() {
         return "L" + String.valueOf(this.id);
     }
+
+    public String toJVMString() {
+    	return "L_" + String.valueOf(this.id);
+    }
 }

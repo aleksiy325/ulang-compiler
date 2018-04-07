@@ -22,4 +22,8 @@ public class FunctionDeclaration extends BaseElement {
     public IRFunction accept (IRVisitor v) {
         return v.visit(this);
     }
+
+    public IRFunction accept (JVMVisitor v) {
+        return v.visit(this);
+    }
 }

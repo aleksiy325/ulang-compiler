@@ -45,4 +45,8 @@ public class FunctionBody extends BaseElement {
         return v.visit(this);
     }
 
+    IRBody accept(JVMVisitor v) {
+        return v.visit(this);
+    }
+
 }

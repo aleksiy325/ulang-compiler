@@ -1,4 +1,4 @@
-import org.antlr.runtime.*;
+ import org.antlr.runtime.*;
 import java.util.List;
 import java.io.*;
 
@@ -27,7 +27,7 @@ public class Compiler {
         String[] fnameTokens = args[0].split("/");
         String filename = fnameTokens[fnameTokens.length - 1];
         filename = filename.substring(0, filename.length() - 3);
-        IRGenerator irgen = new IRGenerator(filename);
+        JVMGenerator irgen = new JVMGenerator(filename);
 
         try {
             Program p = parser.program();

@@ -30,4 +30,8 @@ public class ExpressionList {
     public ArrayList<IRTemp> accept (IRVisitor v) {
         return v.visit(this);
     }
+
+    public ArrayList<IRTemp> accept (JVMVisitor v) {
+        return v.visit(this);
+    }
 }

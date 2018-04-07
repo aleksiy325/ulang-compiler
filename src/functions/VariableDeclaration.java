@@ -15,9 +15,13 @@ public class VariableDeclaration extends BaseElement {
 
     public Type accept (TypeVisitor v) {
         return v.visit(this);
-    }
+    }    
 
     public IRTemp accept (IRVisitor v) {
+        return v.visit(this);
+    }
+
+        public IRTemp accept (JVMVisitor v) {
         return v.visit(this);
     }
 }

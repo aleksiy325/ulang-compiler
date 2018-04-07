@@ -30,4 +30,8 @@ public class Program {
     public IRProgram accept (IRVisitor v) {
         return v.visit(this);
     }
+
+    public IRProgram accept (JVMVisitor v) {
+        return v.visit(this);
+    }
 }

@@ -38,6 +38,10 @@ public class PrimitiveType extends BaseElement implements Comparable<PrimitiveTy
         return v.visit(this);
     }
 
+    public String accept (JVMVisitor v) {
+        return v.visit(this);
+    }
+
     public String toString() {
         return id;
     }
