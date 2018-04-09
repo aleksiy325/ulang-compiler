@@ -21,7 +21,7 @@ public class FunctionCall extends Atom {
         return v.visit(this);
     }
 
-        public IRTemp accept (JVMVisitor v) {
+    public IRTemp accept (JVMVisitor v) {
         return v.visit(this);
     }
 }

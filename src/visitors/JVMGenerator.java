@@ -4,6 +4,9 @@ import java.util.ArrayList;
 public class JVMGenerator implements JVMVisitor {
     HashMap<PrimitiveType, String> typeMap;
     HashMap<String, String> aTypeMap;
+    HashMap<PrimitiveType, String> fTypeMap;
+    HashMap<String, String> irTypeMap;
+
     IRScope scope;
     Scope funcScope;
     ArrayList<String> lines;
@@ -22,9 +25,21 @@ public class JVMGenerator implements JVMVisitor {
         typeMap.put(TypeDefs.booleanPrimitive, "i"); //TODO check
         typeMap.put(TypeDefs.voidPrimitive, "V");
 
+        fTypeMap = new HashMap<PrimitiveType, String>();
+        fTypeMap.put(TypeDefs.integerPrimitive, "I");
+        fTypeMap.put(TypeDefs.floatPrimitive, "F");
+        fTypeMap.put(TypeDefs.charPrimitive, "C");
+        fTypeMap.put(TypeDefs.stringPrimitive, "U");
+        fTypeMap.put(TypeDefs.booleanPrimitive, "Z");
+        fTypeMap.put(TypeDefs.voidPrimitive, "V");
+
         aTypeMap = new HashMap<String, String>();
         aTypeMap.put("i", "int");
         aTypeMap.put("f", "float");
+
+        irTypeMap = new HashMap<String, String>();
+        irTypeMap.put("i", "I");
+        irTypeMap.put("f", "F");
 
         this.lines = new ArrayList<String>();
     }
@@ -47,8 +62,14 @@ public class JVMGenerator implements JVMVisitor {
     public IRFunction visit (FunctionDeclaration fdecl) {
         String irftype = fdecl.type.accept(this);
         ArrayList<IRTemp> irparams = fdecl.params.accept(this);
-        this.funcScope.putGlobalFunction(fdecl.id, new FunctionSignature(fdecl.type));
-        return new IRFunction(fdecl.id, irparams, irftype);
+        FormalParameterList fpl = fdecl.params;
+        ArrayList<Type> types = new ArrayList<Type>();
+        for(FormalParameter fp : fpl.parameterList) {
+            types.add(fp.type);
+        }
+        FunctionSignature fs = new FunctionSignature(fdecl.type, types);
+        this.funcScope.putGlobalFunction(fdecl.id, fs);
+        return new IRFunction(fdecl.id, irparams, irftype, fs);
     }
 
 
@@ -110,7 +131,8 @@ public class JVMGenerator implements JVMVisitor {
         IRTemp temp = this.scope.newTemp(vdecl.id, t);
         if (vdecl.type.isArray) {
             String size = String.valueOf(vdecl.type.size.val);
-            String arrType = aTypeMap.get(temp.getArrayType());
+            String arrType = temp.getArrayType();
+            arrType = this.aTypeMap.get(arrType);
             this.lines.add("ldc " + size);
             this.lines.add("newarray " + arrType);
         } else{
@@ -177,7 +199,10 @@ public class JVMGenerator implements JVMVisitor {
         IRTemp t = astmt.expr.accept(this);
         if (astmt.isArray) {
             IRTemp deref = astmt.deref.expr.accept(this);
-            this.lines.add(n + "[" + deref + "]" + " := " + t + ";"); // TODO: Array assigment
+            this.lines.add("aload " + n.toNString());
+            this.lines.add(deref.type + "load " + deref.toNString());
+            this.lines.add(t.type + "load " + t.toNString());
+            this.lines.add("iastore");
         } else {
             this.lines.add(t.type + "load " + t.toNString());
             this.lines.add(n.type + "store " + n.toNString());
@@ -188,43 +213,65 @@ public class JVMGenerator implements JVMVisitor {
     public IRTemp visit (IfElseStatement stmt) {
         IRLabel clbl = this.scope.newLabel();
         IRTemp cond = stmt.expr.accept(this);
-        this.lines.add(cond + " := " + cond.type + "! " + cond  + ";");
-        this.lines.add("IF " + cond + " goto " + clbl + ";");
+        this.lines.add(cond.type + "load " + cond.toNString());
+        this.lines.add("ldc 1");
+        this.lines.add("ixor");
+        this.lines.add("istore " + cond.toNString());
+        this.lines.add(cond.type + "load " + cond.toNString());
+        this.lines.add("ifne " + clbl);
         stmt.ifblock.accept(this);
         if (stmt.hasElse) {
             IRLabel elbl = this.scope.newLabel();
-            this.lines.add("goto " + elbl + ";");
-            this.lines.add(clbl + ":;");
+            this.lines.add("goto " + elbl);
+            this.lines.add(clbl + ":");
             stmt.elseblock.accept(this);
-            this.lines.add(elbl + ":;");
+            this.lines.add(elbl + ":");
         } else {
-            this.lines.add(clbl + ":;");
+            this.lines.add(clbl + ":");
         }
         return new IRTemp();
     }
 
     public IRTemp visit (PrintStatement stmt) {
         IRTemp t = stmt.expr.accept(this);
-        this.lines.add("PRINT" + t.type + " " + t + ";");
+        this.lines.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        if(t.isArray()){
+            this.lines.add("aload " + t.toNString());
+            this.lines.add("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+        }else{
+            this.lines.add(t.type + "load " + t.toNString());
+            this.lines.add("invokevirtual java/io/PrintStream/print(" + this.irTypeMap.get(t.type) + ")V");
+        }
         return t;
     }
 
     public IRTemp visit (PrintlnStatement stmt) {
         IRTemp t = stmt.expr.accept(this);
-        this.lines.add("PRINTLN" + t.type + " " + t + ";");
+        this.lines.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        if(t.isArray()){
+            this.lines.add("aload " + t.toNString());
+            this.lines.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
+        }else{
+            this.lines.add(t.type + "load " + t.toNString());
+            this.lines.add("invokevirtual java/io/PrintStream/println(" + this.irTypeMap.get(t.type) + ")V");
+        }
         return t;
     }
 
     public IRTemp visit (WhileStatement stmt) {
         IRLabel enter = this.scope.newLabel();
         IRLabel exit = this.scope.newLabel();
-        this.lines.add(enter + ":;");
+        this.lines.add(enter + ":");
         IRTemp cond = stmt.expr.accept(this);
-        this.lines.add(cond + " := " + cond.type + "! " + cond  + ";");
-        this.lines.add("IF " + cond + " goto " + exit + ";");
+        this.lines.add(cond.type + "load " + cond.toNString());
+        this.lines.add("ldc 1");
+        this.lines.add("ixor");
+        this.lines.add("istore " + cond.toNString());
+        this.lines.add(cond.type + "load " + cond.toNString());
+        this.lines.add("ifne " + exit);
         stmt.block.accept(this);
-        this.lines.add("goto " + enter + ";");
-        this.lines.add(exit  + ":;");
+        this.lines.add("goto " + enter);
+        this.lines.add(exit  + ":");
         return new IRTemp();
     }
 
@@ -238,12 +285,12 @@ public class JVMGenerator implements JVMVisitor {
             this.lines.add(left.type  + "load " + left.toNString());
             this.lines.add(right.type + "load " + right.toNString());
             this.lines.add(left.type  + "sub");
-            this.lines.add("ifeq " + trueLabel.toJVMString());
+            this.lines.add("ifeq " + trueLabel);
             this.lines.add("ldc 0");
-            this.lines.add("goto " + falseLabel.toJVMString());
-            this.lines.add(trueLabel.toJVMString() + ":");
+            this.lines.add("goto " + falseLabel);
+            this.lines.add(trueLabel + ":");
             this.lines.add("ldc 1");
-            this.lines.add(falseLabel.toJVMString() + ":");
+            this.lines.add(falseLabel + ":");
             this.lines.add(ret.type + "store " + ret.toNString());
             return ret;
         }
@@ -260,12 +307,12 @@ public class JVMGenerator implements JVMVisitor {
             this.lines.add(left.type  + "load " + left.toNString());
             this.lines.add(right.type + "load " + right.toNString());
             this.lines.add(left.type  + "sub");
-            this.lines.add("iflt " + trueLabel.toJVMString());
+            this.lines.add("iflt " + trueLabel);
             this.lines.add("ldc 0");
-            this.lines.add("goto " + falseLabel.toJVMString());
-            this.lines.add(trueLabel.toJVMString() + ":");
+            this.lines.add("goto " + falseLabel);
+            this.lines.add(trueLabel + ":");
             this.lines.add("ldc 1");
-            this.lines.add(falseLabel.toJVMString() + ":");
+            this.lines.add(falseLabel + ":");
             this.lines.add(ret.type + "store " + ret.toNString());
             return ret;
         }
@@ -313,7 +360,10 @@ public class JVMGenerator implements JVMVisitor {
         IRTemp expr = deref.expr.accept(this);
         String arrType = array.getArrayType();
         IRTemp temp = this.scope.newTemp(arrType);
-        this.lines.add(temp + " := " + array + "[" + expr + "];");
+        this.lines.add("aload " + array.toNString());
+        this.lines.add(expr.type + "load " + expr.toNString());
+        this.lines.add(arrType + "aload");
+        this.lines.add(temp.type + "store " + temp.toNString());
         return temp;
     }
 
@@ -323,17 +373,22 @@ public class JVMGenerator implements JVMVisitor {
 
     public IRTemp visit (FunctionCall call) {
         IRTemp ret = new IRTemp();
-        String line = "CALL " + call.id.val + "(";
-        Type retType = this.funcScope.getFunctionSignature(call.id).type;
-        if (!retType.equals(TypeDefs.voidType)) {
-            ret = this.scope.newTemp(retType.accept(this));
-            line = ret + " := " + line;
-        }
+        ret.type = "v";
+        String line = "invokestatic " + this.name + "/"  + call.id.val + "(";
+        FunctionSignature fs = this.funcScope.getFunctionSignature(call.id);
         ArrayList<IRTemp> args = call.exprs.accept(this);
         for (IRTemp arg : args) {
-            line += arg;
+            this.lines.add(arg.type + "load " + arg.toNString());
         }
-        this.lines.add(line + ");");
+        for (Type type : fs.paramTypes){
+            line += this.fTypeMap.get(type.primType);
+        }
+        line += ")" + this.fTypeMap.get(fs.type.primType);
+        this.lines.add(line);
+        if (!fs.type.equals(TypeDefs.voidType)) {
+            ret = this.scope.newTemp(fs.type.accept(this));
+            this.lines.add(this.typeMap.get(fs.type.primType) + "store " + ret.toNString());
+        }
         return ret;
     }
 
@@ -348,8 +403,8 @@ public class JVMGenerator implements JVMVisitor {
         String line = "return";
         if (!ret.isEmpty) {
             IRTemp t = ret.expr.accept(this);
-            line += " " + t + ";";
-            this.lines.add(line);
+            this.lines.add(t.type + "load " + t.toNString());
+            this.lines.add(t.type + "return ");
             return t;
         }
         this.lines.add(line);

@@ -27,4 +27,18 @@ public class IRBody {
             System.out.println("RETURN;");
         }
     }
+
+    public void printJVM(int params) {
+        System.out.println(".limit locals " + String.valueOf(this.temps.size()));
+        for (int i = params; i < temps.size(); i++) {
+            temps.get(i).printJVMDecl();
+        }
+        System.out.println(".limit stack 16");
+        for (String line : lines) {
+            System.out.println(line);
+        }
+        if (!lines.get(lines.size() - 1 ).startsWith("return")) { // MAke sure all funcs have return hack
+            System.out.println("return");
+        }
+    }
 }

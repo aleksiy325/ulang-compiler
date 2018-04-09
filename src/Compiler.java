@@ -33,7 +33,7 @@ public class Compiler {
             Program p = parser.program();
             p.accept(typeVisitor);
             IRProgram ir = p.accept(irgen);
-            ir.print();
+            ir.printJVM();
         } catch (RecognitionException e )   {
             // A lexical or parsing error occured.
             // ANTLR will have already printed information on the

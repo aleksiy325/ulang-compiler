@@ -1,16 +1,21 @@
+int factorial(int n)
+{
+	int returnValue;
+
+	if (n == 1)
+	{
+		returnValue = 1;
+	}
+	else
+	{
+		returnValue =  n * factorial(n-1);
+	}
+	return returnValue;
+}
+
 void main()
 {
-	int[3] x;
-	int i;
-
-	x[0] = 1;
-	x[1] = 2;
-	x[2] = 3;
-	i = 0;
-
-	while (i < 3)
-	{
-		println x[i];
-		i = i + 1;
-	}
+	print "The factorial of 8 is ";
+	println factorial(8);
 }
+
